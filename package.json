@@ -44,7 +44,7 @@
     "axios": "0.19.2",
     "chai": "4.2.0",
     "concurrently": "5.1.0",
-    "cucumber": "5.1.0",
+    "cucumber": "6.0.5",
     "deep-equal": "2.0.1",
     "fs-monkey": "0.4.0",
     "git-cz": "4.3.1",
