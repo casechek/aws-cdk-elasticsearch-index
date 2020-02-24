@@ -52,7 +52,7 @@
     "husky": "4.2.3",
     "jest": "24.9.0",
     "jsonschema": "1.2.5",
-    "mock-fs": "4.10.4",
+    "mock-fs": "4.11.0",
     "semantic-release": "17.0.4",
     "semantic-release-contributors": "1.0.0",
     "ts-jest": "24.3.0",
