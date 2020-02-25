@@ -4,6 +4,7 @@ import * as path from 'path';
 import { exec } from 'child_process';
 import { existsSync } from 'fs';
 import { ElasticsearchIndex } from '../../lib';
+import { promisify } from 'util';
 
 describe('Elasticsearch Index Custom Resource Stack', () => {
   it('Creates On Event Handler', async () => {
@@ -25,15 +26,8 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
         )
       )
     ) {
-      await new Promise((resolve, reject) => {
-        exec(
-          'npm run webpack',
-          { cwd: path.join(__dirname, '..', '..') },
-          error => {
-            if (error) reject(error);
-            resolve();
-          }
-        );
+      await promisify(exec)('npm run webpack', {
+        cwd: path.join(__dirname, '..', '..'),
       });
     }
 
