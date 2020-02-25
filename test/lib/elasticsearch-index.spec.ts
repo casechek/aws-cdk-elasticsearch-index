@@ -19,7 +19,7 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
           '..',
           '..',
           'dist',
-          'resources',
+          'src',
           'on-event',
           'on-event.js'
         )

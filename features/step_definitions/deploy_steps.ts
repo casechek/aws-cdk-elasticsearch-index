@@ -84,8 +84,8 @@ When(
       `ingressCidrs=${process.env.INGRESS_CIDRS}`,
     ];
 
-    const result = await new Promise((resolve, reject) => {
-      exec(command.join(' '), (error, stdout, stderr) => {
+    await new Promise((resolve, reject) => {
+      exec(command.join(' '), (error, stdout) => {
         if (error) reject(error);
         resolve(stdout);
       });
