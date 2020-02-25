@@ -13,14 +13,14 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false,
-    "sourceMap": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
     "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
-    "outDir": "build",
+    "outDir": "dist",
     "rootDir": ".",
     "preserveWatchOutput": true
-  },
-  "exclude": ["cdk.out", "node_modules", "test", "lib", "features"]
+  }
 }

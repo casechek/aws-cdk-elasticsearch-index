@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig",
+  "exclude": ["cdk.out", "node_modules", "test", "features"]
+}

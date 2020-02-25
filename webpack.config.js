@@ -17,12 +17,14 @@ module.exports = (env, argv) => {
               loader: 'ts-loader',
               options: {
                 transpileOnly: true,
+                configFile: 'tsconfig.src.json'
               },
             },
           ],
           exclude: [
             /test/,
             /cdk.out/,
+            /lib/,
             /node_modules/,
           ],
         },
@@ -34,7 +36,7 @@ module.exports = (env, argv) => {
     externals: ['aws-sdk'],
     output: {
       filename: '[name]/[name].js',
-      path: path.resolve(__dirname, 'dist', 'src'),
+      path: path.resolve(__dirname, 'dist', 'resources'),
       libraryTarget: 'commonjs',
     },
     optimization: {

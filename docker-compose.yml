@@ -4,7 +4,7 @@ services:
   on-event:
     image: lambci/lambda:nodejs12.x
     volumes:
-      - ./dist/src/on-event:/var/task:ro,delegated
+      - ./dist/resources/on-event:/var/task:ro,delegated
     ports:
       - ${ELASTICSEARCH_INDEX_ON_EVENT_PORT:-9001}:9001
     environment:

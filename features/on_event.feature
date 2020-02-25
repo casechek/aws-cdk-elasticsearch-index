@@ -40,18 +40,34 @@ Feature: As a CloudFormation Stack
       "type": "object",
       "title": "The Root Schema",
       "required": [
-        "PhysicalResourceId"
+        "PhysicalResourceId",
+        "Data"
       ],
       "properties": {
         "PhysicalResourceId": {
           "$id": "#/properties/PhysicalResourceId",
           "type": "string",
-          "title": "The Physicalresourceid Schema",
-          "default": "",
           "examples": [
             "somerandomstring"
           ],
           "pattern": "^[0-9a-fA-F]+$"
+        },
+        "Data": {
+          "$id": "#/properties/Data",
+          "type": "object",
+          "required": [
+            "IndexName"
+          ],
+          "properties": {
+            "IndexName": {
+              "$id": "#/properties/IndexName",
+              "type": "string",
+              "examples": [
+                "index-name-ABCDEFG"
+              ],
+              "pattern": "^.*-[a-f0-9]+$"
+            }
+          }
         }
       }
     }

@@ -87,6 +87,12 @@ export class TestStack extends Stack {
       exportName: `ESEndpoint-${this.stackName}`,
       value: `https://${elasticsearchDomain.attrDomainEndpoint}`,
     });
+
+    // tslint:disable-next-line:no-unused-expression
+    new CfnOutput(this, 'ESIndexName', {
+      exportName: `ESIndexName-${this.stackName}`,
+      value: es.indexName,
+    });
   }
 }
 

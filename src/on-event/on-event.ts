@@ -6,6 +6,7 @@ import {
 import { Client } from '@elastic/elasticsearch';
 import { S3 } from 'aws-sdk';
 import { randomBytes } from 'crypto';
+import { INDEX_NAME_KEY } from './constants';
 
 export class TimeoutError extends Error {}
 
@@ -57,6 +58,8 @@ export function createHandler(params: {
       }
 
       log(`attempting to create index ${params.indexName}`);
+      const indexId = randomBytes(16).toString('hex');
+      const indexName = `${params.indexName}-${indexId}`;
       const response = await params.es.indices.create(
         {
           index: params.indexName,
@@ -67,7 +70,10 @@ export function createHandler(params: {
 
       log('response from create index', response);
       return {
-        PhysicalResourceId: randomBytes(16).toString('hex'),
+        PhysicalResourceId: indexId,
+        Data: {
+          [INDEX_NAME_KEY]: indexName,
+        },
       };
     }
 
