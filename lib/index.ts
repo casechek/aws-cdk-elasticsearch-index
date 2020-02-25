@@ -34,7 +34,7 @@ export class ElasticsearchIndex extends cdk.Construct {
     const onEventHandler = new Function(this, 'OnEventHandler', {
       runtime: Runtime.NODEJS_12_X,
       code: Code.fromAsset(
-        path.join(__dirname, '..', 'dist', 'src', 'on-event')
+        path.join(__dirname, '..', 'dist', 'resources', 'on-event')
       ),
       handler: 'on-event.handler',
       environment: {
