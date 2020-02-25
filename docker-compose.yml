@@ -10,7 +10,7 @@ services:
     environment:
       DOCKER_LAMBDA_STAY_OPEN: 1
       DOCKER_LAMBDA_WATCH: 1
-      ELASTICSEARCH_DOMAIN: http://elasticsearch:9200
+      ELASTICSEARCH_ENDPOINT: http://elasticsearch:9200
       ELASTICSEARCH_INDEX: test-index
       S3_BUCKET_NAME: test-bucket
       S3_OBJECT_KEY: test-object-key

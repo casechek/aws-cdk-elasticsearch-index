@@ -12,7 +12,7 @@ import { INDEX_NAME_KEY } from '../src/on-event/constants';
 export interface ElasticsearchIndexProps {
   mappingJSONPath: string;
   elasticSearchIndex: string;
-  elasticSearchDomain: string;
+  elasticSearchEndpoint: string;
   vpc?: IVpc;
   policyArn?: string;
 }
@@ -38,7 +38,7 @@ export class ElasticsearchIndex extends cdk.Construct {
       ),
       handler: 'on-event.handler',
       environment: {
-        ELASTICSEARCH_DOMAIN: props.elasticSearchDomain,
+        ELASTICSEARCH_ENDPOINT: props.elasticSearchEndpoint,
         ELASTICSEARCH_INDEX: props.elasticSearchIndex,
         S3_BUCKET_NAME: mappingJSONAsset.s3BucketName,
         S3_OBJECT_KEY: mappingJSONAsset.s3ObjectKey,

@@ -61,7 +61,7 @@ jobs:
           ON_EVENT_S3_BUCKET_NAME: test-bucket
           ON_EVENT_S3_OBJECT_KEY: test-object-key
           ON_EVENT_INDEX: test-index
-          ELASTICSEARCH_DOMAIN: http://localhost:9200
+          ELASTICSEARCH_ENDPOINT: http://localhost:9200
           ELASTICSEARCH_INDEX: test-index
 
       - name: Semantic Release

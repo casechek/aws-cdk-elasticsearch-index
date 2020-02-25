@@ -90,7 +90,7 @@ export const handler = async (
     s3ForcePathStyle: true,
   });
 
-  const es = new Client({ node: process.env.ELASTICSEARCH_DOMAIN });
+  const es = new Client({ node: process.env.ELASTICSEARCH_ENDPOINT });
 
   const response = await createHandler({
     s3,

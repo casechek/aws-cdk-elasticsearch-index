@@ -7,7 +7,7 @@ let esClient: Client;
 function getESClient(): Client {
   if (esClient == null) {
     esClient = new Client({
-      node: process.env.ELASTICSEARCH_DOMAIN,
+      node: process.env.ELASTICSEARCH_ENDPOINT,
     });
   }
 

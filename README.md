@@ -13,7 +13,7 @@ This construct allows you to deploy an elasticsearch index and all its settings 
   * [Table of Contents](#table-of-contents)
   * [Usage](#usage)
     + [Installation](#installation)
-    + [Create an Elasticsearch Domain (Optional)](#create-an-elasticsearch-domain--optional-)
+    + [Create an Elasticsearch Domain (Optional)](#create-an-elasticsearch-domain-optional)
     + [Create an Index](#create-an-index)
   * [Contributing](#contributing)
     + [Required Software](#required-software)
@@ -94,7 +94,7 @@ import {ElasticsearchIndex} from 'aws-cdk-elasticsearch-index'
 const es = new ElasticsearchIndex(this, 'ElasticsearchIndex', {
   mappingJSONPath: PATH_TO_A_JSON_FILE_CONTAINING_FULL_INDEX_CONFIGURATION,
   elasticSearchIndex: NAME_OF_THE_INDEX_TO_CREATE,
-  elasticSearchDomain: FULL_URL_TO_THE_ELASTICSEARCH_DOMAIN_INCLUDING_SCHEME,
+  elasticSearchEndpoint: FULL_URL_TO_THE_ELASTICSEARCH_ENDPOINT_INCLUDING_SCHEME,
   vpc: VPC_OF_YOUR_ELASTIC_SEARCH_DOMAIN, // If you want to host the lambda functions responsible for resource creation in your vpc
   policyArn: elasticsearchDomain.attrArn, // where elasticSearch domain is your elasticsearch CDK construct instance, only required if you are using AWS Elasticsearch
 });
@@ -153,6 +153,8 @@ docker-compose up
 
 In another window, set the appropriate environment variables and run cucumber:
 
+##### Bash:
+
 ```bash
 AWS_ENDPOINT=http://localhost \
 AWS_REGION=us-east-1 \
@@ -161,8 +163,23 @@ ON_EVENT_PORT=9001 \
 ON_EVENT_S3_BUCKET_NAME=test-bucket \
 ON_EVENT_S3_OBJECT_KEY=test-object-key \
 ON_EVENT_INDEX=test-index \
-ELASTICSEARCH_DOMAIN=http://localhost:9200 \
+ELASTICSEARCH_ENDPOINT=http://localhost:9200 \
 ELASTICSEARCH_INDEX=test-index \
+npm run cucumber -- --tags "not @stack"
+```
+
+##### Powershell:
+
+```powershell
+$env:AWS_ENDPOINT='http://localhost';
+$env:AWS_REGION='us-east-1';
+$env:S3_ENDPOINT='http://localhost:1080';
+$env:ON_EVENT_PORT='9001';
+$env:ON_EVENT_S3_BUCkET_NAME='test-bucket';
+$env:ON_EVENT_S3_OBJECT_KEY='test-object-key';
+$env:ON_EVENT_INDEX='test-index';
+$env:ELASTICSEARCH_ENDPOINT='http://localhost:9200';
+$env:ELASTICSEARCH_INDEX='test-index';
 npm run cucumber -- --tags "not @stack"
 ```
 

@@ -13,6 +13,7 @@ services:
       INSPECT_BRK: ${ELASTICSEARCH_INDEX_ON_EVENT_INSPECT_BRK:-}
       HANDLER: /var/task/on-event
       NODE_PATH: /var/runtime/node_modules:/opt/nodejs/node_modules:/opt/nodejs/node12/node_modules
+      DOCKER_LAMBDA_DEBUG: 1
     volumes:
       - ./entrypoint.sh:/usr/bin/entrypoint.sh:ro,delegated
     entrypoint: /usr/bin/entrypoint.sh

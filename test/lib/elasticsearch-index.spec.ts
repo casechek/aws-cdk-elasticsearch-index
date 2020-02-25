@@ -41,7 +41,7 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
     // tslint:disable-next-line:no-unused-expression
     new ElasticsearchIndex(stack, 'MyTestConstruct', {
       mappingJSONPath: path.join(__dirname, 'resources', 'mapping.json'),
-      elasticSearchDomain: 'domain',
+      elasticSearchEndpoint: 'domain',
       elasticSearchIndex: 'index',
     });
 
