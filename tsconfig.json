@@ -22,5 +22,5 @@
     "rootDir": ".",
     "preserveWatchOutput": true
   },
-  "exclude": ["cdk.out", "node_modules", "test", "lib", "features"]
+  "exclude": ["cdk.out", "node_modules", "lib", "features"]
 }

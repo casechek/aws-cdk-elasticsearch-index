@@ -1,7 +1,7 @@
-import {createHandler, TimeoutError} from '../../../src/on-event/on-event';
-import {OnEventRequest} from '@aws-cdk/custom-resources/lib/provider-framework/types';
-import {S3} from 'aws-sdk';
-import {Client} from '@elastic/elasticsearch';
+import { createHandler, TimeoutError } from '../../../src/on-event/on-event';
+import { OnEventRequest } from '@aws-cdk/custom-resources/lib/provider-framework/types';
+import { S3 } from 'aws-sdk';
+import { Client } from '@elastic/elasticsearch';
 
 jest.mock('aws-sdk');
 jest.mock('@elastic/elasticsearch');
@@ -13,28 +13,38 @@ describe('OnEvent Handler', () => {
   beforeEach(() => {
     s3 = new S3();
     s3.getObject = jest.fn().mockReturnValue({
-      promise: () => Promise.resolve({
-        Body: Buffer.from(JSON.stringify({})),
-      }),
+      promise: () =>
+        Promise.resolve({
+          Body: Buffer.from(JSON.stringify({})),
+        }),
     });
     es = new Client();
   });
 
   it('creates index on create event', async () => {
     es.cluster = {
-      health: jest.fn().mockImplementation().mockResolvedValueOnce({
-        body: {
-          timed_out: true,
-        },
-      }).mockResolvedValueOnce({
-        body: {
-          timed_out: false,
-        },
-      }),
+      health: jest
+        .fn()
+        .mockImplementation()
+        .mockResolvedValueOnce({
+          body: {
+            timed_out: true,
+          },
+        })
+        .mockResolvedValueOnce({
+          body: {
+            timed_out: false,
+          },
+        }),
+      // tslint:disable-next-line:no-any
     } as any;
 
     es.indices = {
-      create: jest.fn().mockImplementation().mockResolvedValue(true),
+      create: jest
+        .fn()
+        .mockImplementation()
+        .mockResolvedValue(true),
+      // tslint:disable-next-line:no-any
     } as any;
 
     const handler = createHandler({
@@ -51,20 +61,27 @@ describe('OnEvent Handler', () => {
     } as OnEventRequest);
 
     // THEN
-    expect(es.indices.create).toHaveBeenCalledWith({
-      index: 'index',
-      body: {},
-    }, {requestTimeout: 120 * 1000, maxRetries: 0});
+    expect(es.indices.create).toHaveBeenCalledWith(
+      {
+        index: 'index',
+        body: {},
+      },
+      { requestTimeout: 120 * 1000, maxRetries: 0 }
+    );
     expect(result).toHaveProperty('PhysicalResourceId');
   });
 
   it('throws if never never healthy', async () => {
     es.cluster = {
-      health: jest.fn().mockImplementation().mockResolvedValue({
-        body: {
-          timed_out: true,
-        },
-      })
+      health: jest
+        .fn()
+        .mockImplementation()
+        .mockResolvedValue({
+          body: {
+            timed_out: true,
+          },
+        }),
+      // tslint:disable-next-line:no-any
     } as any;
 
     const handler = createHandler({
@@ -73,11 +90,13 @@ describe('OnEvent Handler', () => {
       bucketName: 'bucket',
       objectKey: 'key',
       indexName: 'index',
-      maxHealthRetries: 2
+      maxHealthRetries: 2,
     });
 
-    await expect (handler({
-      RequestType: 'Create',
-    } as OnEventRequest)).rejects.toThrow(TimeoutError);
-  })
+    await expect(
+      handler({
+        RequestType: 'Create',
+      } as OnEventRequest)
+    ).rejects.toThrow(TimeoutError);
+  });
 });
