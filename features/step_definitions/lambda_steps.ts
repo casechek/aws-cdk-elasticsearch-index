@@ -21,25 +21,19 @@ When(
   /^I send an event with body:$/,
   { timeout: 60 * 1000 },
   async (event: string) => {
-    response = await new Promise((resolve, reject) => {
-      const client = new Lambda({
-        apiVersion: 'latest',
-        endpoint: port
-          ? `${process.env.AWS_ENDPOINT}:${port}`
-          : process.env.AWS_ENDPOINT,
-        region: process.env.AWS_REGION,
-      });
-      client.invoke(
-        {
-          FunctionName: functionName ?? 'myfunction',
-          Payload: event,
-        },
-        (error: AWSError, data: InvocationResponse) => {
-          if (error != null) return reject(error);
-          resolve(data);
-        }
-      );
+    const client = new Lambda({
+      apiVersion: 'latest',
+      endpoint: port
+        ? `${process.env.AWS_ENDPOINT}:${port}`
+        : process.env.AWS_ENDPOINT,
+      region: process.env.AWS_REGION,
     });
+    response = await client
+      .invoke({
+        FunctionName: functionName ?? 'myfunction',
+        Payload: event,
+      })
+      .promise();
   }
 );
 
