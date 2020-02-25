@@ -1,10 +1,10 @@
-import {Before, Given, Then, When} from 'cucumber';
-import {expect} from 'chai';
-import {Lambda} from 'aws-sdk';
-import {AWSError} from 'aws-sdk/lib/error';
-import {InvocationResponse} from 'aws-sdk/clients/lambda';
+import { Before, Given, Then, When } from 'cucumber';
+import { expect } from 'chai';
+import { Lambda } from 'aws-sdk';
+import { AWSError } from 'aws-sdk/lib/error';
+import { InvocationResponse } from 'aws-sdk/clients/lambda';
 import axios from 'axios';
-import {Validator} from 'jsonschema';
+import { Validator } from 'jsonschema';
 
 let response: InvocationResponse | AWSError;
 let functionName: string | undefined;
@@ -18,69 +18,64 @@ Before(async () => {
 });
 
 When(
-    /^I send an event with body:$/,
-    {timeout: 60 * 1000},
-    async (event: string) => {
-      response = await new Promise((resolve, reject) => {
-        const client = new Lambda({
-          apiVersion: 'latest',
-          endpoint: port ?
-              `${process.env.AWS_ENDPOINT}:${port}` :
-              process.env.AWS_ENDPOINT,
-          region: process.env.AWS_REGION,
-        });
-        client.invoke(
-            {
-              FunctionName: functionName ?? 'myfunction',
-              Payload: event,
-            },
-            (error: AWSError, data: InvocationResponse) => {
-              if (error != null) return reject(error);
-              resolve(data);
-            },
-        );
+  /^I send an event with body:$/,
+  { timeout: 60 * 1000 },
+  async (event: string) => {
+    response = await new Promise((resolve, reject) => {
+      const client = new Lambda({
+        apiVersion: 'latest',
+        endpoint: port
+          ? `${process.env.AWS_ENDPOINT}:${port}`
+          : process.env.AWS_ENDPOINT,
+        region: process.env.AWS_REGION,
       });
-    },
+      client.invoke(
+        {
+          FunctionName: functionName ?? 'myfunction',
+          Payload: event,
+        },
+        (error: AWSError, data: InvocationResponse) => {
+          if (error != null) return reject(error);
+          resolve(data);
+        }
+      );
+    });
+  }
 );
 
 Then(/^the response will be equal to:$/, async (body: string) => {
   expect(
-      JSON.parse(
-          ((response as InvocationResponse).Payload as Buffer).toString()),
+    JSON.parse(((response as InvocationResponse).Payload as Buffer).toString())
   ).to.deep.equal(JSON.parse(body));
 });
 
-Given(
-    /^lambda function "([^"]*)"$/,
-    (functionNameEnv) => {
-      functionName = process.env[functionNameEnv];
-    },
-);
+Given(/^lambda function "([^"]*)"$/, functionNameEnv => {
+  functionName = process.env[functionNameEnv];
+});
 
-Given(/^AWS port "([^"]*)"$/, (portEnv) => {
+Given(/^AWS port "([^"]*)"$/, portEnv => {
   port = process.env[portEnv];
 });
 
 Given(
-    /^a index configuration file "([^"]*)" exists in bucket "([^"]*)" with contents:$/,
-    async (fileNameEnv, bucketNameEnv, contents) => {
-      const path = `/${process.env[bucketNameEnv]}/${process.env[fileNameEnv]}`;
-      await axios.put(`${process.env.S3_ENDPOINT}/mockserver/expectation`, {
-        httpRequest: {
-          path,
-        },
-        httpResponse: {
-          body: contents,
-        },
-      });
-    },
+  /^a index configuration file "([^"]*)" exists in bucket "([^"]*)" with contents:$/,
+  async (fileNameEnv, bucketNameEnv, contents) => {
+    const path = `/${process.env[bucketNameEnv]}/${process.env[fileNameEnv]}`;
+    await axios.put(`${process.env.S3_ENDPOINT}/mockserver/expectation`, {
+      httpRequest: {
+        path,
+      },
+      httpResponse: {
+        body: contents,
+      },
+    });
+  }
 );
 
-Then(/^the response will match schema:$/, (schema) => {
+Then(/^the response will match schema:$/, schema => {
   const result = validator.validate(
-      JSON.parse(
-          ((response as InvocationResponse).Payload as Buffer).toString()),
-      JSON.parse(schema),
+    JSON.parse(((response as InvocationResponse).Payload as Buffer).toString()),
+    JSON.parse(schema)
   );
   if (result.errors.length) {
     throw new Error(result.toString());
