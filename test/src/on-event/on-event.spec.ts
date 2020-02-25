@@ -72,7 +72,7 @@ describe('OnEvent Handler', () => {
     expect(result).toHaveProperty('PhysicalResourceId');
   });
 
-  it('throws if never never healthy', async () => {
+  it('throws if never healthy', async () => {
     es.cluster = {
       health: jest
         .fn()
