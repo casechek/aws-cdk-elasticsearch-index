@@ -14,10 +14,7 @@ describe('OnEvent Handler', () => {
   beforeEach(() => {
     s3 = new S3();
     s3.getObject = jest.fn().mockReturnValue({
-      promise: () =>
-        Promise.resolve({
-          Body: Buffer.from(JSON.stringify({})),
-        }),
+      promise: jest.fn().mockResolvedValue({ Body: Buffer.from('{}') }),
     });
     es = new Client();
   });
