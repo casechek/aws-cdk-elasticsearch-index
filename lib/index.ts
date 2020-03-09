@@ -23,13 +23,14 @@ export class ElasticsearchIndex extends cdk.Construct {
     scope: cdk.Construct,
     id: string,
     props: ElasticsearchIndexProps,
-    onEventCodePath?: string
+    onEventCodePath: string = path.join(
+      __dirname,
+      '..',
+      'resources',
+      'on-event'
+    )
   ) {
     super(scope, id);
-
-    if (!onEventCodePath) {
-      onEventCodePath = path.join(__dirname, '..', 'resources', 'on-event');
-    }
 
     const mappingJSONAsset = new Asset(this, 'IndexCreatorMappingJSON', {
       path: props.mappingJSONPath,
