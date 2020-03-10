@@ -15,7 +15,7 @@ export function createHandler(params: {
   es: Client;
   bucketName: string;
   objectKey: string;
-  indexName: string;
+  indexNamePrefix: string;
   // tslint:disable-next-line:no-any
   logger?: { log: (...value: any) => void };
   maxHealthRetries?: number;
@@ -57,12 +57,12 @@ export function createHandler(params: {
         }
       }
 
-      log(`attempting to create index ${params.indexName}`);
+      log(`attempting to create index ${params.indexNamePrefix}`);
       const indexId = randomBytes(16).toString('hex');
-      const indexName = `${params.indexName}-${indexId}`;
+      const indexName = `${params.indexNamePrefix}-${indexId}`;
       const response = await params.es.indices.create(
         {
-          index: params.indexName,
+          index: indexName,
           body: mapping,
         },
         { requestTimeout: 120 * 1000, maxRetries: 0 }
@@ -97,7 +97,7 @@ export const handler = async (
     es,
     bucketName: process.env.S3_BUCKET_NAME as string,
     objectKey: process.env.S3_OBJECT_KEY as string,
-    indexName: process.env.ELASTICSEARCH_INDEX as string,
+    indexNamePrefix: process.env.ELASTICSEARCH_INDEX as string,
     logger: console,
     maxHealthRetries: process.env.MAX_HEALTH_RETRIES
       ? Number(process.env.MAX_HEALTH_RETRIES)

@@ -50,7 +50,7 @@ describe('OnEvent Handler', () => {
       es,
       bucketName: 'bucket',
       objectKey: 'key',
-      indexName: 'index',
+      indexNamePrefix: 'index',
     });
 
     // WHEN
@@ -87,7 +87,7 @@ describe('OnEvent Handler', () => {
       es,
       bucketName: 'bucket',
       objectKey: 'key',
-      indexName: 'index',
+      indexNamePrefix: 'index',
       maxHealthRetries: 2,
     });
 
@@ -125,7 +125,7 @@ describe('OnEvent Handler', () => {
       es,
       bucketName: 'bucket',
       objectKey: 'key',
-      indexName: 'index',
+      indexNamePrefix: 'index',
     });
 
     // WHEN
