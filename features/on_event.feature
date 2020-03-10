@@ -22,8 +22,8 @@ Feature: As a CloudFormation Stack
       "RequestType": "Create"
     }
     """
-    Then an elasticsearch index "ON_EVENT_INDEX" exists
-    And an elasticsearch index "ON_EVENT_INDEX" has mapping:
+    Then an elasticsearch index prefixed with "ON_EVENT_INDEX" exists
+    And the elasticsearch index has mapping:
     """
     {
       "properties" : {
