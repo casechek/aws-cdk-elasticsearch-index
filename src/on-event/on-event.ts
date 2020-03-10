@@ -57,9 +57,9 @@ export function createHandler(params: {
         }
       }
 
-      log(`attempting to create index ${params.indexNamePrefix}`);
       const indexId = randomBytes(16).toString('hex');
       const indexName = `${params.indexNamePrefix}-${indexId}`;
+      log(`attempting to create index ${indexName}`);
       const response = await params.es.indices.create(
         {
           index: indexName,
