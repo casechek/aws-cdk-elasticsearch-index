@@ -37,7 +37,7 @@ Then(
 
     // @todo this regex should stop at the first whitespace but does not in javascript
     const matches = (indices.body as string).match(
-      new RegExp(process.env[indexNameEnv] + '[^ ]*', 'gm')
+      new RegExp(`${process.env[indexNameEnv]}[^ ]*`, 'gm')
     );
     if (matches && matches.length === 1) {
       indexName = matches[0];
@@ -47,15 +47,10 @@ Then(
   }
 );
 
-Then(
-  /^the elasticsearch index has mapping:$/,
-  async (expected: string) => {
-    const mapping = await getESClient().indices.getMapping({
-      index: indexName as string,
-    });
+Then(/^the elasticsearch index has mapping:$/, async (expected: string) => {
+  const mapping = await getESClient().indices.getMapping({
+    index: indexName as string,
+  });
 
-    expect(
-      mapping.body[indexName].mappings
-    ).to.deep.equal(JSON.parse(expected));
-  }
-);
+  expect(mapping.body[indexName].mappings).to.deep.equal(JSON.parse(expected));
+});
