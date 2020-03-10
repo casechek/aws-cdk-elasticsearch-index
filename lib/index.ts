@@ -19,11 +19,16 @@ export interface ElasticsearchIndexProps {
 
 export class ElasticsearchIndex extends cdk.Construct {
   readonly indexName: string;
-
   constructor(
     scope: cdk.Construct,
     id: string,
-    props: ElasticsearchIndexProps
+    props: ElasticsearchIndexProps,
+    onEventCodePath: string = path.join(
+      __dirname,
+      '..',
+      'resources',
+      'on-event'
+    )
   ) {
     super(scope, id);
 
@@ -33,9 +38,7 @@ export class ElasticsearchIndex extends cdk.Construct {
 
     const onEventHandler = new Function(this, 'OnEventHandler', {
       runtime: Runtime.NODEJS_12_X,
-      code: Code.fromAsset(
-        path.join(__dirname, '..', 'dist', 'resources', 'on-event')
-      ),
+      code: Code.fromAsset(onEventCodePath),
       handler: 'on-event.handler',
       environment: {
         ELASTICSEARCH_ENDPOINT: props.elasticSearchEndpoint,
