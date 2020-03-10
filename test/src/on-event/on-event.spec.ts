@@ -6,6 +6,17 @@ import { INDEX_NAME_KEY } from '../../../src/on-event/constants';
 
 jest.mock('aws-sdk');
 jest.mock('@elastic/elasticsearch');
+jest.mock('crypto', () => {
+  return {
+    randomBytes: () => {
+      return {
+        toString() {
+          return 'random';
+        },
+      };
+    },
+  };
+});
 
 describe('OnEvent Handler', () => {
   let s3: S3;
@@ -61,7 +72,7 @@ describe('OnEvent Handler', () => {
     // THEN
     expect(es.indices.create).toHaveBeenCalledWith(
       {
-        index: 'index',
+        index: 'index-random',
         body: {},
       },
       { requestTimeout: 120 * 1000, maxRetries: 0 }
