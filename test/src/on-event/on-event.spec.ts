@@ -6,17 +6,12 @@ import { INDEX_NAME_KEY } from '../../../src/on-event/constants';
 
 jest.mock('aws-sdk');
 jest.mock('@elastic/elasticsearch');
-jest.mock('crypto', () => {
-  return {
-    randomBytes: () => {
-      return {
-        toString() {
-          return 'random';
-        },
-      };
-    },
-  };
-});
+
+const cryptoToStringFn = jest.fn();
+
+jest.mock('crypto', () => ({
+  randomBytes: () => ({ toString: cryptoToStringFn }),
+}));
 
 describe('OnEvent Handler', () => {
   let s3: S3;
@@ -68,6 +63,8 @@ describe('OnEvent Handler', () => {
     const result = await handler({
       RequestType: 'Create',
     } as OnEventRequest);
+
+    cryptoToStringFn.mockReturnValue('random');
 
     // THEN
     expect(es.indices.create).toHaveBeenCalledWith(
