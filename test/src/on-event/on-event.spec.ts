@@ -59,12 +59,12 @@ describe('OnEvent Handler', () => {
       indexNamePrefix: 'index',
     });
 
+    cryptoToStringFn.mockReturnValue('random');
+
     // WHEN
     const result = await handler({
       RequestType: 'Create',
     } as OnEventRequest);
-
-    cryptoToStringFn.mockReturnValue('random');
 
     // THEN
     expect(es.indices.create).toHaveBeenCalledWith(
