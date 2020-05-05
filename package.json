@@ -48,7 +48,7 @@
     "git-cz": "4.3.1",
     "gts": "1.1.2",
     "husky": "4.2.3",
-    "jest": "25.1.0",
+    "jest": "26.0.1",
     "jsonschema": "1.2.5",
     "semantic-release": "17.0.4",
     "semantic-release-contributors": "1.0.0",
