@@ -27,15 +27,15 @@ describe('OnEvent Handler', () => {
       promise: jest.fn().mockResolvedValue({ Body: Buffer.from('{}') }),
     });
     es = new Client();
-    handler = createHandler({
+    handler = createHandler(
       s3,
       es,
-      bucketParams: {
+      {
         Bucket: 'bucket',
         Key: 'key',
       },
-      indexNamePrefix: 'index',
-    });
+      'index'
+    );
   });
 
   it('creates index on create event', async () => {
@@ -95,16 +95,17 @@ describe('OnEvent Handler', () => {
       // tslint:disable-next-line:no-any
     } as any;
 
-    handler = createHandler({
+    handler = createHandler(
       s3,
       es,
-      bucketParams: {
+      {
         Bucket: 'bucket',
         Key: 'key',
       },
-      indexNamePrefix: 'index',
-      maxHealthRetries: 2,
-    });
+      'index',
+      { log: () => {} },
+      2
+    );
 
     await expect(
       handler({

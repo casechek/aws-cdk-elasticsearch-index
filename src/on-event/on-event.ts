@@ -57,30 +57,25 @@ const createIndexFromMapping = async (
   return { indexId, indexName };
 };
 
-export const createHandler = (params: {
-  s3: S3;
-  es: Client;
-  bucketParams: S3.GetObjectRequest;
-  indexNamePrefix: string;
+export const createHandler = (
+  s3: S3,
+  es: Client,
+  bucketParams: S3.GetObjectRequest,
+  indexNamePrefix: string,
   // tslint:disable-next-line:no-any
-  logger?: { log: (...value: any) => void };
-  maxHealthRetries?: number;
-}): OnEventHandler => {
+  logger: { log: (...value: unknown[]) => void } = { log: () => {} },
+  maxHealthRetries?: number
+): OnEventHandler => {
   return async (event: OnEventRequest): Promise<OnEventResponse> => {
-    const mockLog = () => {};
-    const log = params.logger?.log ?? mockLog;
-
+    const log = logger.log;
     if (['Create', 'Update'].includes(event.RequestType)) {
-      const mapping = await getMappingFromBucket(
-        params.s3,
-        params.bucketParams
-      );
+      const mapping = await getMappingFromBucket(s3, bucketParams);
       log('Downloaded mapping from S3:', mapping);
-      await checkClusterHealth(params.es, params.maxHealthRetries);
+      await checkClusterHealth(es, maxHealthRetries);
       log('Attempting to create index..');
       const { indexId, indexName } = await createIndexFromMapping(
-        params.es,
-        params.indexNamePrefix,
+        es,
+        indexNamePrefix,
         mapping
       );
       log(`Created index ${indexName}`);
@@ -95,7 +90,7 @@ export const createHandler = (params: {
     } else if (event.RequestType === 'Delete') {
       const currentIndexName: string = event.ResourceProperties.IndexName;
       log(`Deleting older index: ${currentIndexName}`);
-      const response = await params.es.indices.delete(
+      const response = await es.indices.delete(
         {
           index: currentIndexName,
         },
@@ -119,19 +114,19 @@ export const handler = async (
     s3ForcePathStyle: true,
   });
   const es = new Client({ node: process.env.ELASTICSEARCH_ENDPOINT });
-  const response = await createHandler({
+  const response = await createHandler(
     s3,
     es,
-    bucketParams: {
+    {
       Bucket: process.env.S3_BUCKET_NAME as string,
       Key: process.env.S3_OBJECT_KEY as string,
     },
-    indexNamePrefix: process.env.ELASTICSEARCH_INDEX as string,
-    logger: console,
-    maxHealthRetries: process.env.MAX_HEALTH_RETRIES
+    process.env.ELASTICSEARCH_INDEX as string,
+    console,
+    process.env.MAX_HEALTH_RETRIES
       ? Number(process.env.MAX_HEALTH_RETRIES)
-      : undefined,
-  })(event);
+      : undefined
+  )(event);
 
   console.log('response', response);
   return response;
