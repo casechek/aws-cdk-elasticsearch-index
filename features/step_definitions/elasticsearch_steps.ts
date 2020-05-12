@@ -28,9 +28,9 @@ Before({ tags: '@clearElasticSearch' }, async () => {
 
 Given(
   /^an elasticsearch index named "([^"]*)" exists with mapping:$/,
-  async (indexNameEnv: string, mapping: string) => {
+  async (existingIndexName: string, mapping: string) => {
     await getESClient().indices.create({
-      index: indexNameEnv,
+      index: existingIndexName,
       body: mapping,
     });
   }
