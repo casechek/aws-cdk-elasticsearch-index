@@ -27,7 +27,7 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
 
     // THEN
     expectCDK(stack).to(
-      haveResource('AWS::Lambda::Function', { Handler: 'on-event.handler' })
+      haveResource('AWS::Lambda::Function', { Handler: 'handler.handler' })
     );
   });
 });

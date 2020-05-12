@@ -38,7 +38,7 @@ export class ElasticsearchIndex extends Construct {
     const onEventHandler = new Function(this, 'OnEventHandler', {
       runtime: Runtime.NODEJS_12_X,
       code: Code.fromAsset(onEventCodePath),
-      handler: 'on-event.handler',
+      handler: 'handler.handler',
       environment: {
         ELASTICSEARCH_ENDPOINT: props.elasticSearchEndpoint,
         ELASTICSEARCH_INDEX: props.elasticSearchIndex,

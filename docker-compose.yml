@@ -16,7 +16,7 @@ services:
       S3_OBJECT_KEY: test-object-key
       S3_ENDPOINT: http://mockserver:1080
       CONTEXT_MISSING_STRATEGY: LOG_ERROR
-    command: on-event.handler
+    command: handler.handler
     depends_on:
       - elasticsearch
 
