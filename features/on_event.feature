@@ -3,7 +3,7 @@ Feature: As a CloudFormation Stack
   In order to complete building a Stack
 
   @clearElasticSearch
-  Scenario: OnEvent
+  Scenario: OnEvent create index
     Given lambda function "ON_EVENT_FUNCTION_NAME"
     And AWS port "ON_EVENT_PORT"
     And a index configuration file "ON_EVENT_S3_OBJECT_KEY" exists in bucket "ON_EVENT_S3_BUCKET_NAME" with contents:
@@ -72,3 +72,28 @@ Feature: As a CloudFormation Stack
       }
     }
     """
+
+  @clearElasticSearch
+  Scenario: OnEvent delete index
+    Given lambda function "ON_EVENT_FUNCTION_NAME"
+    And AWS port "ON_EVENT_PORT"
+    And an elasticsearch index named "test-index" exists with mapping:
+    """
+    {
+      "mappings": {
+        "properties" : {
+          "field1" : { "type" : "text" }
+        }
+      }
+    }
+    """
+    When I send an event with body:
+    """
+    {
+      "RequestType": "Delete",
+      "ResourceProperties": {
+        "IndexName": "test-index"
+      }
+    }
+    """
+    Then an elasticsearch index prefixed with "ON_EVENT_INDEX" does not exist

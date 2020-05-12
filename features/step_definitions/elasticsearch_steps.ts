@@ -1,4 +1,4 @@
-import { Before, Then } from 'cucumber';
+import { Before, Given, Then } from 'cucumber';
 import { Client } from '@elastic/elasticsearch';
 import { expect } from 'chai';
 
@@ -26,6 +26,16 @@ Before({ tags: '@clearElasticSearch' }, async () => {
   }
 });
 
+Given(
+  /^an elasticsearch index named "([^"]*)" exists with mapping:$/,
+  async (indexNameEnv: string, mapping: string) => {
+    await getESClient().indices.create({
+      index: indexNameEnv,
+      body: mapping,
+    });
+  }
+);
+
 Then(
   /^an elasticsearch index prefixed with "([^"]*)" exists$/,
   async (indexNameEnv: string) => {
@@ -44,6 +54,15 @@ Then(
     }
     // tslint:disable-next-line:no-unused-expression
     expect(indexName).to.not.be.empty;
+  }
+);
+
+Then(
+  /^an elasticsearch index prefixed with "([^"]*)" does not exist$/,
+  async (indexNameEnv: string) => {
+    const indices = await getESClient().cat.indices();
+    // tslint:disable-next-line:no-unused-expression
+    expect(indices.body).to.not.contain(process.env[indexNameEnv]);
   }
 );
 
