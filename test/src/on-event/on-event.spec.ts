@@ -1,4 +1,3 @@
-import { createHandler, TimeoutError } from '../../../src/on-event/on-event';
 import {
   OnEventRequest,
   OnEventHandler,
@@ -7,29 +6,44 @@ import { S3 } from 'aws-sdk';
 import { Client } from '@elastic/elasticsearch';
 import { INDEX_NAME_KEY } from '../../../src/on-event/constants';
 
-jest.mock('aws-sdk');
-jest.mock('@elastic/elasticsearch');
-
 const cryptoToStringFn = jest.fn();
 
 jest.mock('crypto', () => ({
   randomBytes: () => ({ toString: cryptoToStringFn }),
 }));
 
+const mockS3GetObject = jest.fn();
+jest.mock('aws-sdk', () => ({
+  S3: jest.fn(() => ({ getObject: mockS3GetObject })),
+}));
+
+const mockEsCreate = jest.fn();
+const mockEsDelete = jest.fn();
+const mockEsHealth = jest.fn();
+const esMock = {
+  cluster: {
+    health: mockEsHealth,
+  },
+  indices: {
+    create: mockEsCreate,
+    delete: mockEsDelete,
+  },
+};
+jest.mock('@elastic/elasticsearch', () => ({
+  Client: jest.fn(() => esMock),
+}));
+import { createHandler, TimeoutError } from '../../../src/on-event/on-event';
+
 describe('OnEvent Handler', () => {
-  let s3: S3;
-  let es: Client;
   let handler: OnEventHandler;
 
   beforeEach(() => {
-    s3 = new S3();
-    s3.getObject = jest.fn().mockReturnValue({
+    mockS3GetObject.mockReturnValue({
       promise: jest.fn().mockResolvedValue({ Body: Buffer.from('{}') }),
     });
-    es = new Client();
     handler = createHandler(
-      s3,
-      es,
+      new S3(),
+      new Client(),
       {
         Bucket: 'bucket',
         Key: 'key',
@@ -38,27 +52,20 @@ describe('OnEvent Handler', () => {
     );
   });
 
+  afterEach(() => {
+    mockEsCreate.mockReset();
+    mockEsDelete.mockReset();
+    mockEsHealth.mockReset();
+    mockS3GetObject.mockReset();
+  });
+
   it('creates index on create event', async () => {
-    es.cluster = {
-      health: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValueOnce({
-          body: {
-            timed_out: false,
-          },
-        }),
-      // tslint:disable-next-line:no-any
-    } as any;
-
-    es.indices = {
-      create: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue(true),
-      // tslint:disable-next-line:no-any
-    } as any;
-
+    mockEsHealth.mockResolvedValueOnce({
+      body: {
+        timed_out: false,
+      },
+    });
+    mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
 
     // WHEN
@@ -67,7 +74,7 @@ describe('OnEvent Handler', () => {
     } as OnEventRequest);
 
     // THEN
-    expect(es.indices.create).toHaveBeenCalledWith(
+    expect(mockEsCreate).toHaveBeenCalledWith(
       {
         index: 'index-random',
         body: {},
@@ -78,17 +85,11 @@ describe('OnEvent Handler', () => {
   });
 
   it('throws if never healthy', async () => {
-    es.cluster = {
-      health: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue({
-          body: {
-            timed_out: true,
-          },
-        }),
-      // tslint:disable-next-line:no-any
-    } as any;
+    mockEsHealth.mockResolvedValueOnce({
+      body: {
+        timed_out: true,
+      },
+    });
 
     await expect(
       handler({
@@ -99,25 +100,12 @@ describe('OnEvent Handler', () => {
 
   it('returns index name on create', async () => {
     // GIVEN
-    es.cluster = {
-      health: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue({
-          body: {
-            timed_out: false,
-          },
-        }),
-      // tslint:disable-next-line:no-any
-    } as any;
-
-    es.indices = {
-      create: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue(true),
-      // tslint:disable-next-line:no-any
-    } as any;
+    mockEsHealth.mockResolvedValueOnce({
+      body: {
+        timed_out: false,
+      },
+    });
+    mockEsCreate.mockResolvedValueOnce(true);
 
     // WHEN
     const result = await handler({
@@ -129,13 +117,7 @@ describe('OnEvent Handler', () => {
   });
 
   it('deletes index on delete event', async () => {
-    es.indices = {
-      delete: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue({ statusCode: 200 }),
-      // tslint:disable-next-line:no-any
-    } as any;
+    mockEsDelete.mockResolvedValueOnce({ statusCode: 200 });
 
     // WHEN
     const result = await handler(({
@@ -146,7 +128,7 @@ describe('OnEvent Handler', () => {
     } as unknown) as OnEventRequest);
 
     // THEN
-    expect(es.indices.delete).toHaveBeenCalledWith(
+    expect(mockEsDelete).toHaveBeenCalledWith(
       {
         index: 'existing-index',
       },
@@ -155,13 +137,7 @@ describe('OnEvent Handler', () => {
   });
 
   it('tries to delete an non-existent index', async () => {
-    es.indices = {
-      delete: jest
-        .fn()
-        .mockImplementation()
-        .mockResolvedValue({ statusCode: 404 }),
-      // tslint:disable-next-line:no-any
-    } as any;
+    mockEsDelete.mockResolvedValueOnce({ statusCode: 404 });
 
     // WHEN
     await expect(
@@ -174,7 +150,7 @@ describe('OnEvent Handler', () => {
     ).rejects.toThrow(Error);
 
     // THEN
-    expect(es.indices.delete).toHaveBeenCalledWith(
+    expect(mockEsDelete).toHaveBeenCalledWith(
       {
         index: 'existing-index',
       },
