@@ -1,5 +1,8 @@
 import { createHandler, TimeoutError } from '../../../src/on-event/on-event';
-import { OnEventRequest } from '@aws-cdk/custom-resources/lib/provider-framework/types';
+import {
+  OnEventRequest,
+  OnEventHandler,
+} from '@aws-cdk/custom-resources/lib/provider-framework/types';
 import { S3 } from 'aws-sdk';
 import { Client } from '@elastic/elasticsearch';
 import { INDEX_NAME_KEY } from '../../../src/on-event/constants';
@@ -16,6 +19,7 @@ jest.mock('crypto', () => ({
 describe('OnEvent Handler', () => {
   let s3: S3;
   let es: Client;
+  let handler: OnEventHandler;
 
   beforeEach(() => {
     s3 = new S3();
@@ -23,6 +27,15 @@ describe('OnEvent Handler', () => {
       promise: jest.fn().mockResolvedValue({ Body: Buffer.from('{}') }),
     });
     es = new Client();
+    handler = createHandler({
+      s3,
+      es,
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
+      indexNamePrefix: 'index',
+    });
   });
 
   it('creates index on create event', async () => {
@@ -50,16 +63,6 @@ describe('OnEvent Handler', () => {
         .mockResolvedValue(true),
       // tslint:disable-next-line:no-any
     } as any;
-
-    const handler = createHandler({
-      s3,
-      es,
-      bucketParams: {
-        Bucket: 'bucket',
-        Key: 'key',
-      },
-      indexNamePrefix: 'index',
-    });
 
     cryptoToStringFn.mockReturnValue('random');
 
@@ -92,7 +95,7 @@ describe('OnEvent Handler', () => {
       // tslint:disable-next-line:no-any
     } as any;
 
-    const handler = createHandler({
+    handler = createHandler({
       s3,
       es,
       bucketParams: {
@@ -132,16 +135,6 @@ describe('OnEvent Handler', () => {
       // tslint:disable-next-line:no-any
     } as any;
 
-    const handler = createHandler({
-      s3,
-      es,
-      bucketParams: {
-        Bucket: 'bucket',
-        Key: 'key',
-      },
-      indexNamePrefix: 'index',
-    });
-
     // WHEN
     const result = await handler({
       RequestType: 'Create',
@@ -159,16 +152,6 @@ describe('OnEvent Handler', () => {
         .mockResolvedValue({ statusCode: 200 }),
       // tslint:disable-next-line:no-any
     } as any;
-
-    const handler = createHandler({
-      s3,
-      es,
-      bucketParams: {
-        Bucket: 'bucket',
-        Key: 'key',
-      },
-      indexNamePrefix: 'index',
-    });
 
     // WHEN
     const result = await handler(({
@@ -195,16 +178,6 @@ describe('OnEvent Handler', () => {
         .mockResolvedValue({ statusCode: 404 }),
       // tslint:disable-next-line:no-any
     } as any;
-
-    const handler = createHandler({
-      s3,
-      es,
-      bucketParams: {
-        Bucket: 'bucket',
-        Key: 'key',
-      },
-      indexNamePrefix: 'index',
-    });
 
     // WHEN
     await expect(
