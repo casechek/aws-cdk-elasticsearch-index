@@ -20,23 +20,12 @@ const getMappingFromBucket = async (
 };
 
 const checkClusterHealth = async (es: Client, maxRetries = 10) => {
-  let retryHealth = maxRetries;
-  while (retryHealth > 0) {
-    const response = await es.cluster.health(
-      {
-        wait_for_status: 'yellow',
-        timeout: '60s',
-      },
-      { maxRetries: 0 }
-    );
-    if (response.body.timed_out) {
-      retryHealth -= 1;
-      if (retryHealth === 0) {
-        throw new TimeoutError();
-      }
-    } else {
-      retryHealth = 0;
-    }
+  const response = await es.cluster.health(
+    { wait_for_status: 'yellow', timeout: '60s' },
+    { maxRetries }
+  );
+  if (response.body.timed_out) {
+    throw new TimeoutError();
   }
 };
 
@@ -47,7 +36,7 @@ const createIndexFromMapping = async (
 ): Promise<{ indexId: string; indexName: string }> => {
   const indexId = randomBytes(16).toString('hex');
   const indexName = `${indexNamePrefix}-${indexId}`;
-  const response = await es.indices.create(
+  await es.indices.create(
     {
       index: indexName,
       body: mapping,

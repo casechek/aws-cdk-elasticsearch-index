@@ -45,11 +45,6 @@ describe('OnEvent Handler', () => {
         .mockImplementation()
         .mockResolvedValueOnce({
           body: {
-            timed_out: true,
-          },
-        })
-        .mockResolvedValueOnce({
-          body: {
             timed_out: false,
           },
         }),
@@ -94,18 +89,6 @@ describe('OnEvent Handler', () => {
         }),
       // tslint:disable-next-line:no-any
     } as any;
-
-    handler = createHandler(
-      s3,
-      es,
-      {
-        Bucket: 'bucket',
-        Key: 'key',
-      },
-      'index',
-      { log: () => {} },
-      2
-    );
 
     await expect(
       handler({
