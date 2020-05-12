@@ -12,23 +12,14 @@ export class TimeoutError extends Error {}
 
 const getMappingFromBucket = async (
   s3: S3,
-  bucketParams: S3.GetObjectRequest,
-  // tslint:disable-next-line:no-any
-  logger: (...value: any) => void
+  bucketParams: S3.GetObjectRequest
 ): Promise<string> => {
   const s3ObjectResponse = await s3.getObject(bucketParams).promise();
   const mapping = JSON.parse((s3ObjectResponse.Body as Buffer).toString());
-  logger('Downloaded mapping from S3:', mapping);
   return mapping;
 };
 
-const checkClusterHealth = async (
-  es: Client,
-  maxRetries = 10,
-  // tslint:disable-next-line:no-any
-  logger: (...value: any) => void
-) => {
-  logger('Waiting for cluster to become healthy');
+const checkClusterHealth = async (es: Client, maxRetries = 10) => {
   let retryHealth = maxRetries;
   while (retryHealth > 0) {
     const response = await es.cluster.health(
@@ -38,7 +29,6 @@ const checkClusterHealth = async (
       },
       { maxRetries: 0 }
     );
-    logger('received health response', response.body);
     if (response.body.timed_out) {
       retryHealth -= 1;
       if (retryHealth === 0) {
@@ -53,13 +43,10 @@ const checkClusterHealth = async (
 const createIndexFromMapping = async (
   es: Client,
   indexNamePrefix: string,
-  mapping: string,
-  // tslint:disable-next-line:no-any
-  logger: (...value: any) => void
+  mapping: string
 ): Promise<{ indexId: string; indexName: string }> => {
   const indexId = randomBytes(16).toString('hex');
   const indexName = `${indexNamePrefix}-${indexId}`;
-  logger(`Attempting to create index ${indexName}`);
   const response = await es.indices.create(
     {
       index: indexName,
@@ -67,11 +54,10 @@ const createIndexFromMapping = async (
     },
     { requestTimeout: 120 * 1000, maxRetries: 0 }
   );
-  logger('Response from create index:', response);
   return { indexId, indexName };
 };
 
-export function createHandler(params: {
+export const createHandler = (params: {
   s3: S3;
   es: Client;
   bucketParams: S3.GetObjectRequest;
@@ -79,7 +65,7 @@ export function createHandler(params: {
   // tslint:disable-next-line:no-any
   logger?: { log: (...value: any) => void };
   maxHealthRetries?: number;
-}): OnEventHandler {
+}): OnEventHandler => {
   return async (event: OnEventRequest): Promise<OnEventResponse> => {
     const mockLog = () => {};
     const log = params.logger?.log ?? mockLog;
@@ -87,16 +73,17 @@ export function createHandler(params: {
     if (['Create', 'Update'].includes(event.RequestType)) {
       const mapping = await getMappingFromBucket(
         params.s3,
-        params.bucketParams,
-        log
+        params.bucketParams
       );
-      await checkClusterHealth(params.es, params.maxHealthRetries, log);
+      log('Downloaded mapping from S3:', mapping);
+      await checkClusterHealth(params.es, params.maxHealthRetries);
+      log('Attempting to create index..');
       const { indexId, indexName } = await createIndexFromMapping(
         params.es,
         params.indexNamePrefix,
-        mapping,
-        log
+        mapping
       );
+      log(`Created index ${indexName}`);
       // PhysicalResourceId will change with each update, which will trigger
       // a DELETE event for the older resource.
       return {
@@ -121,7 +108,7 @@ export function createHandler(params: {
 
     return {};
   };
-}
+};
 
 /* istanbul ignore next */
 export const handler = async (
@@ -131,9 +118,7 @@ export const handler = async (
     endpoint: process.env.S3_ENDPOINT,
     s3ForcePathStyle: true,
   });
-
   const es = new Client({ node: process.env.ELASTICSEARCH_ENDPOINT });
-
   const response = await createHandler({
     s3,
     es,
