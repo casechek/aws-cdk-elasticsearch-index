@@ -150,4 +150,78 @@ describe('OnEvent Handler', () => {
     // THEN
     expect(result?.Data?.[INDEX_NAME_KEY]).toContain('index-');
   });
+
+  it('deletes index on delete event', async () => {
+    es.indices = {
+      delete: jest
+        .fn()
+        .mockImplementation()
+        .mockResolvedValue({ statusCode: 200 }),
+      // tslint:disable-next-line:no-any
+    } as any;
+
+    const handler = createHandler({
+      s3,
+      es,
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
+      indexNamePrefix: 'index',
+    });
+
+    // WHEN
+    const result = await handler(({
+      RequestType: 'Delete',
+      ResourceProperties: {
+        IndexName: 'existing-index',
+      },
+    } as unknown) as OnEventRequest);
+
+    // THEN
+    expect(es.indices.delete).toHaveBeenCalledWith(
+      {
+        index: 'existing-index',
+      },
+      { requestTimeout: 120 * 1000, maxRetries: 0 }
+    );
+  });
+
+  it('tries to delete an non-existent index', async () => {
+    es.indices = {
+      delete: jest
+        .fn()
+        .mockImplementation()
+        .mockResolvedValue({ statusCode: 404 }),
+      // tslint:disable-next-line:no-any
+    } as any;
+
+    const handler = createHandler({
+      s3,
+      es,
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
+      indexNamePrefix: 'index',
+    });
+
+    // WHEN
+    await expect(
+      handler(({
+        RequestType: 'Delete',
+        ResourceProperties: {
+          IndexName: 'existing-index',
+        },
+      } as unknown) as OnEventRequest)
+    ).rejects.toThrow(Error);
+
+    // THEN
+    expect(es.indices.delete).toHaveBeenCalledWith(
+      {
+        index: 'existing-index',
+      },
+      { requestTimeout: 120 * 1000, maxRetries: 0 }
+    );
+  });
 });
