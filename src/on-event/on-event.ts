@@ -51,7 +51,6 @@ export const createHandler = (
   es: Client,
   bucketParams: S3.GetObjectRequest,
   indexNamePrefix: string,
-  // tslint:disable-next-line:no-any
   logger: { log: (...value: unknown[]) => void } = { log: () => {} },
   maxHealthRetries?: number
 ): OnEventHandler => {
