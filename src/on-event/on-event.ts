@@ -12,10 +12,14 @@ export class TimeoutError extends Error {}
 
 const getMappingFromBucket = async (
   s3: S3,
-  bucketParams: S3.GetObjectRequest
+  bucketParams: S3.GetObjectRequest,
+  // tslint:disable-next-line:no-any
+  logger: (...value: any) => void
 ): Promise<string> => {
   const s3ObjectResponse = await s3.getObject(bucketParams).promise();
-  return JSON.parse((s3ObjectResponse.Body as Buffer).toString());
+  const mapping = JSON.parse((s3ObjectResponse.Body as Buffer).toString());
+  logger('Downloaded mapping from S3:', mapping);
+  return mapping;
 };
 
 const checkClusterHealth = async (
@@ -24,6 +28,7 @@ const checkClusterHealth = async (
   // tslint:disable-next-line:no-any
   logger: (...value: any) => void
 ) => {
+  logger('Waiting for cluster to become healthy');
   let retryHealth = maxRetries;
   while (retryHealth > 0) {
     const response = await es.cluster.health(
@@ -48,8 +53,7 @@ const checkClusterHealth = async (
 export function createHandler(params: {
   s3: S3;
   es: Client;
-  bucketName: string;
-  objectKey: string;
+  bucketParams: S3.GetObjectRequest;
   indexNamePrefix: string;
   // tslint:disable-next-line:no-any
   logger?: { log: (...value: any) => void };
@@ -57,15 +61,14 @@ export function createHandler(params: {
 }): OnEventHandler {
   return async (event: OnEventRequest): Promise<OnEventResponse> => {
     const mockLog = () => {};
-    const log = params.logger?.log ?? mockLog; // two lines because PhpStorm doesn't quite handle ?? correctly in the case of a function as value
+    const log = params.logger?.log ?? mockLog;
 
     if (event.RequestType === 'Create') {
-      const mapping = await getMappingFromBucket(params.s3, {
-        Bucket: params.bucketName,
-        Key: params.objectKey,
-      });
-      log('Downloaded mapping from S3:', mapping);
-      log('Waiting for cluster to become healthy');
+      const mapping = await getMappingFromBucket(
+        params.s3,
+        params.bucketParams,
+        log
+      );
       await checkClusterHealth(params.es, params.maxHealthRetries, log);
 
       const indexId = randomBytes(16).toString('hex');
@@ -78,8 +81,8 @@ export function createHandler(params: {
         },
         { requestTimeout: 120 * 1000, maxRetries: 0 }
       );
-
       log('Response from create index:', response);
+
       return {
         PhysicalResourceId: indexId,
         Data: {
@@ -106,8 +109,10 @@ export const handler = async (
   const response = await createHandler({
     s3,
     es,
-    bucketName: process.env.S3_BUCKET_NAME as string,
-    objectKey: process.env.S3_OBJECT_KEY as string,
+    bucketParams: {
+      Bucket: process.env.S3_BUCKET_NAME as string,
+      Key: process.env.S3_OBJECT_KEY as string,
+    },
     indexNamePrefix: process.env.ELASTICSEARCH_INDEX as string,
     logger: console,
     maxHealthRetries: process.env.MAX_HEALTH_RETRIES
