@@ -54,8 +54,10 @@ describe('OnEvent Handler', () => {
     const handler = createHandler({
       s3,
       es,
-      bucketName: 'bucket',
-      objectKey: 'key',
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
       indexNamePrefix: 'index',
     });
 
@@ -93,8 +95,10 @@ describe('OnEvent Handler', () => {
     const handler = createHandler({
       s3,
       es,
-      bucketName: 'bucket',
-      objectKey: 'key',
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
       indexNamePrefix: 'index',
       maxHealthRetries: 2,
     });
@@ -131,8 +135,10 @@ describe('OnEvent Handler', () => {
     const handler = createHandler({
       s3,
       es,
-      bucketName: 'bucket',
-      objectKey: 'key',
+      bucketParams: {
+        Bucket: 'bucket',
+        Key: 'key',
+      },
       indexNamePrefix: 'index',
     });
 

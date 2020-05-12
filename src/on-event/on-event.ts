@@ -50,6 +50,27 @@ const checkClusterHealth = async (
   }
 };
 
+const createIndexFromMapping = async (
+  es: Client,
+  indexNamePrefix: string,
+  mapping: string,
+  // tslint:disable-next-line:no-any
+  logger: (...value: any) => void
+): Promise<{ indexId: string; indexName: string }> => {
+  const indexId = randomBytes(16).toString('hex');
+  const indexName = `${indexNamePrefix}-${indexId}`;
+  logger(`Attempting to create index ${indexName}`);
+  const response = await es.indices.create(
+    {
+      index: indexName,
+      body: mapping,
+    },
+    { requestTimeout: 120 * 1000, maxRetries: 0 }
+  );
+  logger('Response from create index:', response);
+  return { indexId, indexName };
+};
+
 export function createHandler(params: {
   s3: S3;
   es: Client;
@@ -63,32 +84,39 @@ export function createHandler(params: {
     const mockLog = () => {};
     const log = params.logger?.log ?? mockLog;
 
-    if (event.RequestType === 'Create') {
+    if (['Create', 'Update'].includes(event.RequestType)) {
       const mapping = await getMappingFromBucket(
         params.s3,
         params.bucketParams,
         log
       );
       await checkClusterHealth(params.es, params.maxHealthRetries, log);
-
-      const indexId = randomBytes(16).toString('hex');
-      const indexName = `${params.indexNamePrefix}-${indexId}`;
-      log(`Attempting to create index ${indexName}`);
-      const response = await params.es.indices.create(
-        {
-          index: indexName,
-          body: mapping,
-        },
-        { requestTimeout: 120 * 1000, maxRetries: 0 }
+      const { indexId, indexName } = await createIndexFromMapping(
+        params.es,
+        params.indexNamePrefix,
+        mapping,
+        log
       );
-      log('Response from create index:', response);
-
+      // PhysicalResourceId will change with each update, which will trigger
+      // a DELETE event for the older resource.
       return {
         PhysicalResourceId: indexId,
         Data: {
           [INDEX_NAME_KEY]: indexName,
         },
       };
+    } else if (event.RequestType === 'Delete') {
+      const currentIndexName: string = event.ResourceProperties.IndexName;
+      log(`Deleting older index: ${currentIndexName}`);
+      const response = await params.es.indices.delete(
+        {
+          index: currentIndexName,
+        },
+        { requestTimeout: 120 * 1000, maxRetries: 0 }
+      );
+      if (response.statusCode !== 200) {
+        throw new Error();
+      }
     }
 
     return {};
