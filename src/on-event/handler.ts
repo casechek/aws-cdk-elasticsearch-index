@@ -3,7 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import { S3 } from 'aws-sdk';
 import { createHandler } from './on-event';
 
-/* istanbul ignore next */
+/* istanbul ignore file */
 const s3 = new S3({
   endpoint: process.env.S3_ENDPOINT,
   s3ForcePathStyle: true,
