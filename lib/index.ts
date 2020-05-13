@@ -1,11 +1,10 @@
-import { Construct, Duration } from '@aws-cdk/core';
+import { Construct, CustomResource, Duration } from '@aws-cdk/core';
 import { Asset } from '@aws-cdk/aws-s3-assets';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { Code, Function, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { Provider } from '@aws-cdk/custom-resources';
 import * as path from 'path';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { CustomResource } from '@aws-cdk/aws-cloudformation';
 import { INDEX_NAME_KEY } from '../src/on-event/constants';
 
 export interface ElasticsearchIndexProps {
@@ -67,7 +66,7 @@ export class ElasticsearchIndex extends Construct {
     });
 
     const resource = new CustomResource(this, 'ElasticsearchIndex', {
-      provider,
+      serviceToken: provider.serviceToken,
     });
 
     this.indexName = resource.getAttString(INDEX_NAME_KEY);
