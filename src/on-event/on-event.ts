@@ -56,6 +56,7 @@ export const createHandler = (
 ): OnEventHandler => {
   return async (event: OnEventRequest): Promise<OnEventResponse> => {
     const log = logger.log;
+    log('Received event:', event);
     if (['Create', 'Update'].includes(event.RequestType)) {
       const mapping = await getMappingFromBucket(s3, bucketParams);
       log('Downloaded mapping from S3:', mapping);
