@@ -68,8 +68,8 @@ export class ElasticsearchIndex extends Construct {
     const resource = new CustomResource(this, 'ElasticsearchIndex', {
       serviceToken: provider.serviceToken,
       properties: {
-        mappingJSONPath: props.mappingJSONPath
-      }
+        mappingJSONPath: props.mappingJSONPath,
+      },
     });
 
     this.indexName = resource.getAttString(INDEX_NAME_KEY);

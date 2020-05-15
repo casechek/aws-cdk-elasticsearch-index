@@ -122,16 +122,12 @@ describe('OnEvent Handler', () => {
     // WHEN
     const result = await handler(({
       RequestType: 'Delete',
-      ResourceProperties: {
-        IndexName: 'existing-index',
-      },
+      PhysicalResourceId: 'existing-index',
     } as unknown) as OnEventRequest);
 
     // THEN
     expect(mockEsDelete).toHaveBeenCalledWith(
-      {
-        index: 'existing-index',
-      },
+      { index: 'existing-index' },
       { requestTimeout: 120 * 1000, maxRetries: 0 }
     );
   });
@@ -143,17 +139,13 @@ describe('OnEvent Handler', () => {
     await expect(
       handler(({
         RequestType: 'Delete',
-        ResourceProperties: {
-          IndexName: 'existing-index',
-        },
+        PhysicalResourceId: 'existing-index',
       } as unknown) as OnEventRequest)
     ).rejects.toThrow(Error);
 
     // THEN
     expect(mockEsDelete).toHaveBeenCalledWith(
-      {
-        index: 'existing-index',
-      },
+      { index: 'existing-index' },
       { requestTimeout: 120 * 1000, maxRetries: 0 }
     );
   });
