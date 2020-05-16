@@ -174,7 +174,7 @@ Feature: As a CloudFormation Stack
     """
     {
       "RequestType": "Delete",
-      "PhysicalResourceId": 'test-index'
+      "PhysicalResourceId": "test-index"
     }
     """
     Then an elasticsearch index prefixed with "ON_EVENT_INDEX" does not exist
