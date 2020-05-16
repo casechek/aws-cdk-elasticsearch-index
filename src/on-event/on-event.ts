@@ -47,7 +47,6 @@ const reIndexAllDocuments = async (
   oldIndex: string,
   newIndex: string
 ) => {
-  console.log(`The indices are new: ${oldIndex} and old: ${newIndex}`);
   const response = await es.reindex({
     wait_for_completion: true,
     refresh: true,
@@ -94,6 +93,9 @@ export const createHandler = (
         Data: { [INDEX_NAME_KEY]: indexName },
       };
     } else if (event.RequestType === 'Update') {
+      if (event.PhysicalResourceId == null) {
+        throw new Error('event.PhysicalResourceId is required');
+      }
       const mapping = await getMappingFromBucket(s3, bucketParams);
       log('Downloaded mapping from S3:', mapping);
       await checkClusterHealth(es, maxHealthRetries);
@@ -104,7 +106,7 @@ export const createHandler = (
         indexNamePrefix,
         mapping
       );
-      log(`Created index ${newIndexName}`);
+      log(`Created index ${newIndexName}, reindexing from ${oldIndexName}..`);
       await reIndexAllDocuments(es, oldIndexName, newIndexName);
       return {
         PhysicalResourceId: newIndexName,
@@ -122,7 +124,7 @@ export const createHandler = (
       );
 
       if (response.statusCode !== 200) {
-        throw new Error();
+        throw new Error('Error when deleting the older index.');
       }
 
       return { PhysicalResourceId: currentIndexName };

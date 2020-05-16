@@ -20,6 +20,7 @@ jest.mock('aws-sdk', () => ({
 const mockEsCreate = jest.fn();
 const mockEsDelete = jest.fn();
 const mockEsHealth = jest.fn();
+const mockEsReIndex = jest.fn();
 const esMock = {
   cluster: {
     health: mockEsHealth,
@@ -28,6 +29,7 @@ const esMock = {
     create: mockEsCreate,
     delete: mockEsDelete,
   },
+  reindex: mockEsReIndex,
 };
 jest.mock('@elastic/elasticsearch', () => ({
   Client: jest.fn(() => esMock),
@@ -116,6 +118,83 @@ describe('OnEvent Handler', () => {
     expect(result?.Data?.[INDEX_NAME_KEY]).toContain('index-');
   });
 
+  it('updates index on update event', async () => {
+    mockEsHealth.mockResolvedValueOnce({
+      body: {
+        timed_out: false,
+      },
+    });
+    mockEsReIndex.mockResolvedValueOnce({
+      body: {
+        timed_out: false,
+      },
+    });
+    mockEsCreate.mockResolvedValueOnce(true);
+    cryptoToStringFn.mockReturnValue('random');
+
+    const oldIndex = 'old-index';
+    const newIndex = 'index-random';
+
+    // WHEN
+    const result = await handler({
+      RequestType: 'Update',
+      PhysicalResourceId: oldIndex,
+    } as OnEventRequest);
+
+    // THEN
+    expect(mockEsCreate).toHaveBeenCalledWith(
+      {
+        index: newIndex,
+        body: {},
+      },
+      { requestTimeout: 120 * 1000, maxRetries: 0 }
+    );
+    expect(mockEsReIndex).toHaveBeenCalledWith({
+      wait_for_completion: true,
+      refresh: true,
+      body: {
+        source: {
+          index: 'old-index',
+        },
+        dest: {
+          index: newIndex,
+        },
+      },
+    });
+    expect(result).toHaveProperty('PhysicalResourceId');
+  });
+
+  it('throws if reindex request times out', async () => {
+    mockEsHealth.mockResolvedValueOnce({
+      body: {
+        timed_out: false,
+      },
+    });
+    mockEsReIndex.mockResolvedValueOnce({
+      body: {
+        timed_out: true,
+      },
+    });
+    mockEsCreate.mockResolvedValueOnce(true);
+    cryptoToStringFn.mockReturnValue('random');
+
+    await expect(
+      handler({
+        RequestType: 'Update',
+        PhysicalResourceId: 'old-index',
+      } as OnEventRequest)
+    ).rejects.toThrow(TimeoutError);
+  });
+
+  it('throws when an Update request has no PhysicalResourceId ', async () => {
+    // WHEN and THEN
+    await expect(
+      handler(({
+        RequestType: 'Update',
+      } as unknown) as OnEventRequest)
+    ).rejects.toThrow(Error);
+  });
+
   it('deletes index on delete event', async () => {
     mockEsDelete.mockResolvedValueOnce({ statusCode: 200 });
 
@@ -148,5 +227,14 @@ describe('OnEvent Handler', () => {
       { index: 'existing-index' },
       { requestTimeout: 120 * 1000, maxRetries: 0 }
     );
+  });
+
+  it('throws when a Delete request has no PhysicalResourceId ', async () => {
+    // WHEN and THEN
+    await expect(
+      handler(({
+        RequestType: 'Delete',
+      } as unknown) as OnEventRequest)
+    ).rejects.toThrow(Error);
   });
 });

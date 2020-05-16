@@ -21,6 +21,7 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
         mappingJSONPath: path.join(__dirname, 'resources', 'mapping.json'),
         elasticSearchEndpoint: 'domain',
         elasticSearchIndex: 'index',
+        policyArn: 'arn::some-arn',
       },
       __dirname
     );
