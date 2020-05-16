@@ -47,8 +47,10 @@ const reIndexAllDocuments = async (
   oldIndex: string,
   newIndex: string
 ) => {
+  console.log(`The indices are new: ${oldIndex} and old: ${newIndex}`);
   const response = await es.reindex({
     wait_for_completion: true,
+    refresh: true,
     body: {
       source: {
         index: oldIndex,
@@ -58,6 +60,9 @@ const reIndexAllDocuments = async (
       },
     },
   });
+  if (response.body.timed_out) {
+    throw new TimeoutError();
+  }
 };
 
 export const createHandler = (
@@ -100,7 +105,7 @@ export const createHandler = (
         mapping
       );
       log(`Created index ${newIndexName}`);
-      // await reIndexAllDocuments(es, oldIndexName, newIndexName);
+      await reIndexAllDocuments(es, oldIndexName, newIndexName);
       return {
         PhysicalResourceId: newIndexName,
         Data: { [INDEX_NAME_KEY]: newIndexName },

@@ -101,7 +101,8 @@ Feature: As a CloudFormation Stack
     When I send an event with body:
     """
     {
-      "RequestType": "Update"
+      "RequestType": "Update",
+      "PhysicalResourceId": "first-index"
     }
     """
     Then an elasticsearch index prefixed with "ON_EVENT_INDEX" exists
