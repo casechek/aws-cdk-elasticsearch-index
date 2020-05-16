@@ -41,6 +41,7 @@ Then(
   async (indexNameEnv: string) => {
     const indices = await getESClient().cat.indices();
 
+    console.log(indices.body);
     // tslint:disable-next-line:no-unused-expression
     expect(indices.body).to.contain(process.env[indexNameEnv]);
     expect(indices.statusCode).to.be.equal(200);

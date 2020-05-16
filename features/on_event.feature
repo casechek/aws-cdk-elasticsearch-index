@@ -50,7 +50,7 @@ Feature: As a CloudFormation Stack
           "examples": [
             "somerandomstring"
           ],
-          "pattern": "^[0-9a-fA-F]+$"
+          "pattern": "^.*-[a-f0-9]+$"
         },
         "Data": {
           "$id": "#/properties/Data",
@@ -133,7 +133,7 @@ Feature: As a CloudFormation Stack
           "examples": [
             "somerandomstring"
           ],
-          "pattern": "^[0-9a-fA-F]+$"
+          "pattern": "^.*-[a-f0-9]+$"
         },
         "Data": {
           "$id": "#/properties/Data",
@@ -174,9 +174,7 @@ Feature: As a CloudFormation Stack
     """
     {
       "RequestType": "Delete",
-      "ResourceProperties": {
-        "IndexName": "test-index"
-      }
+      "PhysicalResourceId": 'test-index'
     }
     """
     Then an elasticsearch index prefixed with "ON_EVENT_INDEX" does not exist
