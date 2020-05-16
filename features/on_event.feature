@@ -87,6 +87,12 @@ Feature: As a CloudFormation Stack
       }
     }
     """
+    And an elasticsearch index named "first-index" has this document indexed:
+    """
+    {
+      "field1": "le-foo-value"
+    }
+    """
     And a index configuration file "ON_EVENT_S3_OBJECT_KEY" exists in bucket "ON_EVENT_S3_BUCKET_NAME" with contents:
     """
     {
@@ -113,6 +119,12 @@ Feature: As a CloudFormation Stack
         "field1" : { "type" : "text" },
         "field2" : { "type" : "text" }
       }
+    }
+    """
+    And the elasticsearch index has this document indexed:
+    """
+    {
+      "field1": "le-foo-value"
     }
     """
     And the response will match schema:

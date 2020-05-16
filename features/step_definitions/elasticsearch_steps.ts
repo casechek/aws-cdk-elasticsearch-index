@@ -36,6 +36,17 @@ Given(
   }
 );
 
+Given(
+  /^an elasticsearch index named "([^"]*)" has this document indexed:$/,
+  async (existingIndexName: string, mapping: string) => {
+    await getESClient().index({
+      index: existingIndexName,
+      refresh: 'true',
+      body: mapping,
+    });
+  }
+);
+
 Then(
   /^an elasticsearch index prefixed with "([^"]*)" exists$/,
   async (indexNameEnv: string) => {
@@ -74,3 +85,15 @@ Then(/^the elasticsearch index has mapping:$/, async (expected: string) => {
 
   expect(mapping.body[indexName].mappings).to.deep.equal(JSON.parse(expected));
 });
+
+Then(
+  /^the elasticsearch index has this document indexed:$/,
+  async (expected: string) => {
+    const result = await getESClient().search({
+      index: indexName as string,
+      body: { query: { match: JSON.parse(expected) } },
+    });
+
+    expect(result.body.hits.total.value).to.deep.equal(1);
+  }
+);
