@@ -52,7 +52,6 @@ Then(
   async (indexNameEnv: string) => {
     const indices = await getESClient().cat.indices();
 
-    console.log(indices.body);
     // tslint:disable-next-line:no-unused-expression
     expect(indices.body).to.contain(process.env[indexNameEnv]);
     expect(indices.statusCode).to.be.equal(200);
@@ -94,6 +93,6 @@ Then(
       body: { query: { match: JSON.parse(expected) } },
     });
 
-    expect(result.body.hits.total.value).to.deep.equal(1);
+    expect(result.body.hits.total.value).to.equal(1);
   }
 );

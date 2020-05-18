@@ -1,10 +1,7 @@
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import * as path from 'path';
-import { exec } from 'child_process';
-import { existsSync } from 'fs';
 import { ElasticsearchIndex } from '../../lib';
-import { promisify } from 'util';
 
 describe('Elasticsearch Index Custom Resource Stack', () => {
   it('Creates On Event Handler', async () => {
