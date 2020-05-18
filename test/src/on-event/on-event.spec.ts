@@ -206,7 +206,7 @@ describe('OnEvent Handler', () => {
         RequestType: 'Delete',
         PhysicalResourceId: 'existing-index',
       } as unknown) as OnEventRequest)
-    ).rejects.toThrow(Error);
+    ).rejects.toThrowError('Error when deleting the older index.');
 
     // THEN
     expect(mockEsDelete).toHaveBeenCalledWith(
