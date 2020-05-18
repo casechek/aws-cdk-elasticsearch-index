@@ -36,6 +36,17 @@ jest.mock('@elastic/elasticsearch', () => ({
 }));
 import { createHandler, TimeoutError } from '../../../src/on-event/on-event';
 
+const noTimeOutResponse = {
+  body: {
+    timed_out: false,
+  },
+};
+
+const timeOutResponse = {
+  body: {
+    timed_out: true,
+  },
+};
 describe('OnEvent Handler', () => {
   let handler: OnEventHandler;
 
@@ -62,11 +73,7 @@ describe('OnEvent Handler', () => {
   });
 
   it('creates index on create event', async () => {
-    mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
-    });
+    mockEsHealth.mockResolvedValueOnce(noTimeOutResponse);
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
 
@@ -87,11 +94,7 @@ describe('OnEvent Handler', () => {
   });
 
   it('throws if never healthy', async () => {
-    mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: true,
-      },
-    });
+    mockEsHealth.mockResolvedValueOnce(timeOutResponse);
 
     await expect(
       handler({
@@ -102,11 +105,7 @@ describe('OnEvent Handler', () => {
 
   it('returns index name on create', async () => {
     // GIVEN
-    mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
-    });
+    mockEsHealth.mockResolvedValueOnce(noTimeOutResponse);
     mockEsCreate.mockResolvedValueOnce(true);
 
     // WHEN
@@ -119,16 +118,8 @@ describe('OnEvent Handler', () => {
   });
 
   it('updates index on update event', async () => {
-    mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
-    });
-    mockEsReIndex.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
-    });
+    mockEsHealth.mockResolvedValueOnce(noTimeOutResponse);
+    mockEsReIndex.mockResolvedValueOnce(noTimeOutResponse);
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
 
@@ -165,16 +156,8 @@ describe('OnEvent Handler', () => {
   });
 
   it('throws if reindex request times out', async () => {
-    mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
-    });
-    mockEsReIndex.mockResolvedValueOnce({
-      body: {
-        timed_out: true,
-      },
-    });
+    mockEsHealth.mockResolvedValueOnce(noTimeOutResponse);
+    mockEsReIndex.mockResolvedValueOnce(timeOutResponse);
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
 
