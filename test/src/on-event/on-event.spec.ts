@@ -192,7 +192,7 @@ describe('OnEvent Handler', () => {
       handler(({
         RequestType: 'Update',
       } as unknown) as OnEventRequest)
-    ).rejects.toThrow(Error);
+    ).rejects.toThrowError('event.PhysicalResourceId is required');
   });
 
   it('deletes index on delete event', async () => {
@@ -235,6 +235,6 @@ describe('OnEvent Handler', () => {
       handler(({
         RequestType: 'Delete',
       } as unknown) as OnEventRequest)
-    ).rejects.toThrow(Error);
+    ).rejects.toThrowError('event.PhysicalResourceId is required');
   });
 });
