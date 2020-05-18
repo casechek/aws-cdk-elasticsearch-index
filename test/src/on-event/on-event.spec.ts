@@ -63,9 +63,7 @@ describe('OnEvent Handler', () => {
 
   it('creates index on create event', async () => {
     mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
+      body: { timed_out: false },
     });
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
@@ -88,9 +86,7 @@ describe('OnEvent Handler', () => {
 
   it('throws if never healthy', async () => {
     mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: true,
-      },
+      body: { timed_out: true },
     });
 
     await expect(
@@ -103,9 +99,7 @@ describe('OnEvent Handler', () => {
   it('returns index name on create', async () => {
     // GIVEN
     mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
+      body: { timed_out: false },
     });
     mockEsCreate.mockResolvedValueOnce(true);
 
@@ -120,14 +114,10 @@ describe('OnEvent Handler', () => {
 
   it('updates index on update event', async () => {
     mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
+      body: { timed_out: false },
     });
     mockEsReIndex.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
+      body: { timed_out: false },
     });
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
@@ -166,14 +156,10 @@ describe('OnEvent Handler', () => {
 
   it('throws if reindex request times out', async () => {
     mockEsHealth.mockResolvedValueOnce({
-      body: {
-        timed_out: false,
-      },
+      body: { timed_out: false },
     });
     mockEsReIndex.mockResolvedValueOnce({
-      body: {
-        timed_out: true,
-      },
+      body: { timed_out: true },
     });
     mockEsCreate.mockResolvedValueOnce(true);
     cryptoToStringFn.mockReturnValue('random');
