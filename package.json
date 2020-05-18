@@ -1,6 +1,6 @@
 {
   "name": "@casechek/aws-cdk-elasticsearch-index",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.16",
   "description": "Elasticsearch Index Custom Resource for AWS CDK",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
