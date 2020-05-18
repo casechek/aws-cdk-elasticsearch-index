@@ -237,4 +237,13 @@ describe('OnEvent Handler', () => {
       } as unknown) as OnEventRequest)
     ).rejects.toThrowError('event.PhysicalResourceId is required');
   });
+
+  it('throws when a request is not an expected type', async () => {
+    // WHEN and THEN
+    await expect(
+      handler(({
+        RequestType: 'Other',
+      } as unknown) as OnEventRequest)
+    ).rejects.toThrowError('Unknown Request Type');
+  });
 });

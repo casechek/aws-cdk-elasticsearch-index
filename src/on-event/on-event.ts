@@ -130,6 +130,6 @@ export const createHandler = (
       return { PhysicalResourceId: currentIndexName };
     }
 
-    return {};
+    throw new Error('Unknown Request Type');
   };
 };
