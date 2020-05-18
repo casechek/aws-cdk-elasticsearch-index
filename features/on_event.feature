@@ -48,7 +48,7 @@ Feature: As a CloudFormation Stack
           "$id": "#/properties/PhysicalResourceId",
           "type": "string",
           "examples": [
-            "somerandomstring"
+            "somerandomestring-0123abc"
           ],
           "pattern": "^.*-[a-f0-9]+$"
         },
@@ -144,7 +144,7 @@ Feature: As a CloudFormation Stack
           "$id": "#/properties/PhysicalResourceId",
           "type": "string",
           "examples": [
-            "somerandomstring"
+            "somerandomestring-0123abc"
           ],
           "pattern": "^.*-[a-f0-9]+$"
         },
