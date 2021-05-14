@@ -43,7 +43,7 @@ export class ElasticsearchIndex extends Construct {
         ELASTICSEARCH_INDEX: props.elasticSearchIndex,
         S3_BUCKET_NAME: mappingJSONAsset.s3BucketName,
         S3_OBJECT_KEY: mappingJSONAsset.s3ObjectKey,
-        S3_URL: mappingJSONAsset.s3Url,
+        S3_URL: mappingJSONAsset.httpUrl,
       },
       timeout: Duration.minutes(14),
       vpc: props.vpc,
