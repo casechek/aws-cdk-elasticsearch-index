@@ -37,7 +37,7 @@
     "@types/jsonschema": "1.1.1",
     "@types/memory-fs": "0.3.2",
     "@types/mock-fs": "4.10.0",
-    "@types/node": "10.17.17",
+    "@types/node": "10.17.60",
     "@types/webpack": "4.41.28",
     "aws-cdk": "^1.37.0",
     "aws-xray-sdk-core": "2.5.0",
