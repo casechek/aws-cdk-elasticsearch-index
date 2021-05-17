@@ -50,7 +50,7 @@ jobs:
         run: sleep 60
 
       - name: Cucumber Tests
-        run: npm run cucumber -- --tags "not @stack"
+        run: ./run-e2e.sh
         env:
           AWS_ENDPOINT: http://localhost
           AWS_REGION: us-east-1
