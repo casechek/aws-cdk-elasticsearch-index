@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Build Package
+    name: Release Package
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -29,7 +29,7 @@ jobs:
       - name: Build Library
         run: npm run build:prod
       - name: Semantic Release
-        run: npm run semantic-release
+        run: npm run semantic-release -- --branches fix/github-token
         env:
           GH_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
