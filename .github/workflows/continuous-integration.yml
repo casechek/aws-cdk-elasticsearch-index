@@ -44,7 +44,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Setup Docker for Cucumber Test
-        run: docker-compose -f docker-compose.yml up -d
+        run: docker-compose -f docker-compose.yml up -d 1>&2
 
       - name: Sleep for 60 # we could do health checks here for better accuracy
         run: sleep 60
