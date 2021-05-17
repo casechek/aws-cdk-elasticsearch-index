@@ -42,6 +42,7 @@ Feature: As a CloudFormation Stack
       "PhysicalResourceId": "abc"
     }
     """
+    And I wait "1" seconds
     Then an elasticsearch index with prefix "ON_EVENT_INDEX" with id not "abc" exists
     And the elasticsearch index with prefix "ON_EVENT_INDEX" with id not "abc" has mapping:
     """

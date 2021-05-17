@@ -37,6 +37,14 @@ When(
   }
 );
 
+When(
+  /^I wait "([^"]*)" seconds$/,
+  { timeout: 30 * 1000 },
+  async (seconds: number) => {
+    await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+  }
+);
+
 Then(/^the response will be equal to:$/, async (body: string) => {
   expect(
     JSON.parse(((response as InvocationResponse).Payload as Buffer).toString())

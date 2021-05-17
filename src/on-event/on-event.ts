@@ -49,7 +49,7 @@ const reIndexAllDocuments = async (
   newIndex: string
 ) => {
   const response = await es.reindex({
-    wait_for_completion: true,
+    wait_for_completion: false,
     refresh: true,
     body: {
       source: {

@@ -145,7 +145,7 @@ describe('OnEvent Handler', () => {
       { requestTimeout: 120 * 1000, maxRetries: 0 }
     );
     expect(mockEsReIndex).toHaveBeenCalledWith({
-      wait_for_completion: true,
+      wait_for_completion: false,
       refresh: true,
       body: {
         source: {
