@@ -7,50 +7,81 @@ on:
     tags: ~
 
 jobs:
-  test:
-    name: Build Package
-
+  lint:
+    name: Run linter
     runs-on: ubuntu-latest
-
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
       - uses: actions/checkout@v2
-
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-
       - uses: actions/cache@v2
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
       - name: Install Packages
         run: npm install
-
       - name: Format Check
         run: npm run check
-
-      - name: Build Library
-        run: npm run build:prod
-
+  unit_test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Packages
+        run: npm install
       - name: Unit Tests
         run: npm run test -- --coverage
-
       - name: Upload Coverage
         run: bash <(curl -s https://codecov.io/bash)
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Setup Docker for Cucumber Test
-        run: docker-compose -f docker-compose.yml up -d
-
-      - name: Sleep for 60 # we could do health checks here for better accuracy
-        run: sleep 60
-
+  feature_test:
+    name: Run feature tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Packages
+        run: npm install
+      - name: Build Library
+        run: npm run build:prod
       - name: Cucumber Tests
-        run: npm run cucumber -- --tags "not @stack"
+        run: |
+          docker-compose -f docker-compose.yml up -d
+          sleep 60
+          npm run cucumber -- --tags "not @stack"
         env:
           AWS_ACCESS_KEY_ID: SOME_ACCESS_KEY_ID
           AWS_SECRET_ACCESS_KEY: SOME_SECRET_ACCESS_KEY
@@ -63,9 +94,3 @@ jobs:
           ON_EVENT_INDEX: test-index
           ELASTICSEARCH_ENDPOINT: http://localhost:9200
           ELASTICSEARCH_INDEX: test-index
-
-      - name: Semantic Release
-        run: npm run semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
