@@ -54,6 +54,8 @@ jobs:
         env:
           AWS_ENDPOINT: http://localhost
           AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: SOME_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: SOME_SECRET_ACCESS_KEY
           S3_ENDPOINT: http://localhost:1080
           ON_EVENT_PORT: 9001
           ON_EVENT_S3_BUCKET_NAME: test-bucket
