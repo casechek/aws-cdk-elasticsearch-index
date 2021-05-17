@@ -94,31 +94,3 @@ jobs:
           ON_EVENT_INDEX: test-index
           ELASTICSEARCH_ENDPOINT: http://localhost:9200
           ELASTICSEARCH_INDEX: test-index
-  release:
-    name: Build Package
-    needs: [unit_test, feature_test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          access_token: ${{ github.token }}
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install Packages
-        run: npm install
-      - name: Build Library
-        run: npm run build:prod
-      - name: Semantic Release
-        run: npm run semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
