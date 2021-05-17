@@ -50,7 +50,7 @@
     "husky": "4.2.3",
     "jest": "25.1.0",
     "jsonschema": "1.2.5",
-    "semantic-release": "17.0.7",
+    "semantic-release": "17.2.3",
     "semantic-release-contributors": "1.0.0",
     "ts-jest": "25.2.1",
     "ts-loader": "6.2.1",
