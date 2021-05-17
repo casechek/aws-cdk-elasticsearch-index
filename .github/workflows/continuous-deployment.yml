@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Continuous Deployment
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Build Package
+    name: Release Package
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -31,5 +31,5 @@ jobs:
       - name: Semantic Release
         run: npm run semantic-release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
