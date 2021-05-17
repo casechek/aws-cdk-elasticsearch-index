@@ -74,9 +74,6 @@ export const createHandler = (
   maxHealthRetries?: number
 ): OnEventHandler => {
   return async (event: OnEventRequest): Promise<OnEventResponse> => {
-    console.log('handler env:');
-    console.dir(process.env);
-
     const log = logger.log;
     log('Received event:', event);
 
