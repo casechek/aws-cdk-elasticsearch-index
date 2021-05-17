@@ -8,7 +8,6 @@ on:
 jobs:
   release:
     name: Build Package
-    needs: [unit_test, feature_test]
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
