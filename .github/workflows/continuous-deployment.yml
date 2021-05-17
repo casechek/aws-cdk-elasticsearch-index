@@ -2,7 +2,7 @@ name: Continuous Deployment
 
 on:
   push:
-    branches: [master, alpha, fix/github-token]
+    branches: [master, alpha]
     tags: ~
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       - name: Build Library
         run: npm run build:prod
       - name: Semantic Release
-        run: npm run semantic-release -- --branches fix/github-token
+        run: npm run semantic-release
         env:
           GH_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
