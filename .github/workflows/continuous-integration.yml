@@ -52,8 +52,6 @@ jobs:
       - name: Cucumber Tests
         run: npm run cucumber -- --tags "not @stack"
         env:
-          AWS_ACCESS_KEY_ID: fake
-          AWS_SECRET_ACCESS_KEY: fake
           AWS_ENDPOINT: http://localhost
           AWS_REGION: us-east-1
           S3_ENDPOINT: http://localhost:1080
