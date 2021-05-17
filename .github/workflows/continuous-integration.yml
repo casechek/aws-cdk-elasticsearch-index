@@ -43,14 +43,11 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Setup Docker for Cucumber Test
-        run: docker-compose -f docker-compose.yml up -d 1>&2
-
-      - name: Sleep for 60 # we could do health checks here for better accuracy
-        run: sleep 60
-
       - name: Cucumber Tests
-        run: npm run cucumber -- --tags "not @stack"
+        run: |
+          docker-compose -f docker-compose.yml up -d 1>&2
+          sleep 60
+          npm run cucumber -- --tags "not @stack"
         env:
           AWS_ENDPOINT: http://localhost
           AWS_REGION: us-east-1
