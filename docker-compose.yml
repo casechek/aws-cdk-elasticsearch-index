@@ -8,6 +8,8 @@ services:
     ports:
       - ${ELASTICSEARCH_INDEX_ON_EVENT_PORT:-9001}:9001
     environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
       DOCKER_LAMBDA_STAY_OPEN: 1
       DOCKER_LAMBDA_WATCH: 1
       ELASTICSEARCH_ENDPOINT: http://elasticsearch:9200
