@@ -1,0 +1,11 @@
+export AWS_ENDPOINT="http://localhost"
+export AWS_REGION="us-east-1"
+export S3_ENDPOINT="http://localhost:1080"
+export ON_EVENT_PORT="9001"
+export ON_EVENT_S3_BUCKET_NAME="test-bucket"
+export ON_EVENT_S3_OBJECT_KEY="test-object-key"
+export ON_EVENT_INDEX="test-index"
+export ELASTICSEARCH_ENDPOINT="http://localhost:9200"
+export ELASTICSEARCH_INDEX="test-index"
+
+npm run cucumber -- --tags "not @stack"
