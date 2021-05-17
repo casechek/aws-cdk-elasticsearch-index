@@ -8,8 +8,6 @@ services:
     ports:
       - ${ELASTICSEARCH_INDEX_ON_EVENT_PORT:-9001}:9001
     environment:
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
       DOCKER_LAMBDA_STAY_OPEN: 1
       DOCKER_LAMBDA_WATCH: 1
       ELASTICSEARCH_ENDPOINT: http://elasticsearch:9200
@@ -18,6 +16,8 @@ services:
       S3_OBJECT_KEY: test-object-key
       S3_ENDPOINT: http://mockserver:1080
       CONTEXT_MISSING_STRATEGY: LOG_ERROR
+      AWS_ACCESS_KEY_ID: SOME_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: SOME_SECRET_ACCESS_KEY
     command: handler.handler
     depends_on:
       - elasticsearch
