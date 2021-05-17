@@ -11,6 +11,9 @@ let functionName: string;
 let port: string | undefined;
 const validator = new Validator();
 
+console.log('cucumber steps env:');
+console.dir(process.env);
+
 Before(async () => {
   if (process.env.S3_ENDPOINT) {
     await axios.put(`${process.env.S3_ENDPOINT}/reset`);
