@@ -49,7 +49,7 @@
     "gts": "1.1.2",
     "husky": "4.2.3",
     "jest": "25.1.0",
-    "jsonschema": "1.2.5",
+    "jsonschema": "1.4.0",
     "semantic-release": "17.2.3",
     "semantic-release-contributors": "1.0.0",
     "ts-jest": "25.2.1",
