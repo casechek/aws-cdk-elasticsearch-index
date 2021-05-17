@@ -2,7 +2,7 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [master, alpha]
+    branches: [master, alpha, fix/github-token]
     tags: ~
 
 jobs:
@@ -31,5 +31,5 @@ jobs:
       - name: Semantic Release
         run: npm run semantic-release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
