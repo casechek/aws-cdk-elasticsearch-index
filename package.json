@@ -43,7 +43,7 @@
     "aws-xray-sdk-core": "2.5.0",
     "axios": "0.21.1",
     "chai": "4.2.0",
-    "concurrently": "5.1.0",
+    "concurrently": "6.2.0",
     "cucumber": "5.1.0",
     "git-cz": "4.3.1",
     "gts": "1.1.2",
