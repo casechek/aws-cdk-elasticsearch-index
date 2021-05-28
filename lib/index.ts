@@ -73,6 +73,12 @@ export class ElasticsearchIndex extends Construct {
     mappingJSONAsset.grantRead(onEventHandler);
 
     if (props.policyArn) {
+      isCompleteHandler.addToRolePolicy(
+        new PolicyStatement({
+          actions: ['es:ESHttpGet', 'es:ESHttpHead', 'es:ESHttpPut'],
+          resources: [props.policyArn],
+        })
+      );
       onEventHandler.addToRolePolicy(
         new PolicyStatement({
           actions: ['es:ESHttpGet', 'es:ESHttpHead', 'es:ESHttpPut'],
