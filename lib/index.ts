@@ -5,7 +5,7 @@ import { Code, Function, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { Provider } from '@aws-cdk/custom-resources';
 import * as path from 'path';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { INDEX_NAME_KEY } from '../src/on-event/constants';
+import { INDEX_NAME_KEY } from '../src/constants';
 
 export interface ElasticsearchIndexProps {
   mappingJSONPath: string;
@@ -17,6 +17,7 @@ export interface ElasticsearchIndexProps {
 
 export class ElasticsearchIndex extends Construct {
   readonly indexName: string;
+
   constructor(
     scope: Construct,
     id: string,
@@ -26,6 +27,12 @@ export class ElasticsearchIndex extends Construct {
       '..',
       'resources',
       'on-event'
+    ),
+    isCompleteCodePath: string = path.join(
+      __dirname,
+      '..',
+      'resources',
+      'is-complete'
     )
   ) {
     super(scope, id);
@@ -34,10 +41,23 @@ export class ElasticsearchIndex extends Construct {
       path: props.mappingJSONPath,
     });
 
+    const isCompleteHandler = new Function(this, 'IsCompleteHandler', {
+      runtime: Runtime.NODEJS_14_X,
+      code: Code.fromAsset(isCompleteCodePath),
+      handler: 'is-complete.handler',
+      environment: {
+        ELASTICSEARCH_ENDPOINT: props.elasticSearchEndpoint,
+        ELASTICSEARCH_INDEX: props.elasticSearchIndex,
+      },
+      timeout: Duration.minutes(1),
+      vpc: props.vpc,
+      tracing: Tracing.ACTIVE,
+    });
+
     const onEventHandler = new Function(this, 'OnEventHandler', {
       runtime: Runtime.NODEJS_12_X,
       code: Code.fromAsset(onEventCodePath),
-      handler: 'handler.handler',
+      handler: 'on-event.handler',
       environment: {
         ELASTICSEARCH_ENDPOINT: props.elasticSearchEndpoint,
         ELASTICSEARCH_INDEX: props.elasticSearchIndex,
@@ -63,6 +83,7 @@ export class ElasticsearchIndex extends Construct {
 
     const provider = new Provider(this, 'ElasticsearchIndexProvider', {
       onEventHandler,
+      isCompleteHandler,
     });
 
     const resource = new CustomResource(this, 'ElasticsearchIndex', {
