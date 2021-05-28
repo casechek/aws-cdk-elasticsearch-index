@@ -6,7 +6,7 @@ import {
 import { Client } from '@elastic/elasticsearch';
 import { S3 } from 'aws-sdk';
 import { randomBytes } from 'crypto';
-import { INDEX_NAME_KEY } from './constants';
+import { INDEX_NAME_KEY, OLD_INDEX_NAME_KEY, TASK_ID_KEY } from '../constants';
 
 export class TimeoutError extends Error {}
 
@@ -47,7 +47,7 @@ const reIndexAllDocuments = async (
   es: Client,
   oldIndex: string,
   newIndex: string
-) => {
+): Promise<string | undefined> => {
   const response = await es.reindex({
     wait_for_completion: false,
     refresh: true,
@@ -63,6 +63,7 @@ const reIndexAllDocuments = async (
   if (response.body.timed_out) {
     throw new TimeoutError();
   }
+  return response.body?.taskId;
 };
 
 export const createHandler = (
@@ -108,10 +109,15 @@ export const createHandler = (
         mapping
       );
       log(`Created index ${indexName}, reindexing from ${oldIndexName}..`);
-      await reIndexAllDocuments(es, oldIndexName, indexName);
+      const taskId = await reIndexAllDocuments(es, oldIndexName, indexName);
       return {
         PhysicalResourceId: indexId,
-        Data: { [INDEX_NAME_KEY]: indexName },
+        Data: {
+          [INDEX_NAME_KEY]: indexName,
+          ...(taskId !== undefined
+            ? { [OLD_INDEX_NAME_KEY]: oldIndexName, [TASK_ID_KEY]: taskId }
+            : {}),
+        },
       };
     } else if (event.RequestType === 'Delete') {
       if (event.PhysicalResourceId == null) {

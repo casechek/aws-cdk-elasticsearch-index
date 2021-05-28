@@ -84,7 +84,9 @@ Feature: As a CloudFormation Stack
           "$id": "#/properties/Data",
           "type": "object",
           "required": [
-            "IndexName"
+            "IndexName",
+            "OldIndexName",
+            "TaskId"
           ],
           "properties": {
             "IndexName": {
