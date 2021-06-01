@@ -63,7 +63,7 @@ const reIndexAllDocuments = async (
   if (response.body.timed_out) {
     throw new TimeoutError();
   }
-  return response.body?.taskId;
+  return response.body?.task;
 };
 
 export const createHandler = (
@@ -110,6 +110,7 @@ export const createHandler = (
       );
       log(`Created index ${indexName}, reindexing from ${oldIndexName}..`);
       const taskId = await reIndexAllDocuments(es, oldIndexName, indexName);
+      log(`Reindex task id is ${taskId}`);
       return {
         PhysicalResourceId: indexId,
         Data: {
