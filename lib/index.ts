@@ -13,6 +13,8 @@ export interface ElasticsearchIndexProps {
   elasticSearchEndpoint: string;
   vpc?: IVpc;
   policyArn?: string;
+  queryInterval?: Duration;
+  totalTimeout?: Duration;
 }
 
 export class ElasticsearchIndex extends Construct {
@@ -90,6 +92,8 @@ export class ElasticsearchIndex extends Construct {
     const provider = new Provider(this, 'ElasticsearchIndexProvider', {
       onEventHandler,
       isCompleteHandler,
+      queryInterval: props.queryInterval ?? Duration.minutes(2),
+      totalTimeout: props.totalTimeout ?? Duration.minutes(60),
     });
 
     const resource = new CustomResource(this, 'ElasticsearchIndex', {
