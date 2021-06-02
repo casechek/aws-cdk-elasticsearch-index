@@ -6,7 +6,8 @@ module.exports = (env, argv) => {
     target: 'node',
     devtool: 'eval-source-map',
     entry: {
-      'handler': './src/on-event/handler.ts',
+      'on-event': './src/on-event/handler.ts',
+      'is-complete': './src/is-complete/handler.ts',
     },
     module: {
       rules: [
@@ -35,7 +36,7 @@ module.exports = (env, argv) => {
     },
     externals: ['aws-sdk'],
     output: {
-      filename: 'on-event/[name].js',
+      filename: '[name]/[name].js',
       path: path.resolve(__dirname, 'dist', 'resources'),
       libraryTarget: 'commonjs',
     },

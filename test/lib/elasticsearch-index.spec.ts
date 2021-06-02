@@ -4,7 +4,7 @@ import * as path from 'path';
 import { ElasticsearchIndex } from '../../lib';
 
 describe('Elasticsearch Index Custom Resource Stack', () => {
-  it('Creates On Event Handler', async () => {
+  it('Creates OnEvent and IsComplete Handlers', async () => {
     // GIVEN
     const app = new cdk.App();
     const stack = new cdk.Stack(app, 'TestStack');
@@ -20,12 +20,16 @@ describe('Elasticsearch Index Custom Resource Stack', () => {
         elasticSearchIndex: 'index',
         policyArn: 'arn::some-arn',
       },
+      __dirname,
       __dirname
     );
 
     // THEN
     expectCDK(stack).to(
-      haveResource('AWS::Lambda::Function', { Handler: 'handler.handler' })
+      haveResource('AWS::Lambda::Function', { Handler: 'on-event.handler' })
+    );
+    expectCDK(stack).to(
+      haveResource('AWS::Lambda::Function', { Handler: 'is-complete.handler' })
     );
   });
 });
