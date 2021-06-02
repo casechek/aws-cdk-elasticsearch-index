@@ -15,6 +15,7 @@ This construct allows you to deploy an elasticsearch index and all its settings 
     + [Installation](#installation)
     + [Create an Elasticsearch Domain (Optional)](#create-an-elasticsearch-domain-optional)
     + [Create an Index](#create-an-index)
+  * [Tip for testing in an existing project](#tip-for-testing-in-an-existing-project)
   * [Contributing](#contributing)
     + [Required Software](#required-software)
     + [Obtaining the Source](#obtaining-the-source)
@@ -99,6 +100,21 @@ const es = new ElasticsearchIndex(this, 'ElasticsearchIndex', {
   policyArn: elasticsearchDomain.attrArn, // where elasticSearch domain is your elasticsearch CDK construct instance, only required if you are using AWS Elasticsearch
 });
 ```
+
+## Tip for testing in an existing project
+
+It's helpful to be able to test a change you're working on in your own project's stack. To do that with a working branch of this repo, here are some tips:
+
+**Note:** This is assuming you have `aws-cdk-elasticsearch-index` and some `my_project` project directory in 2 folders in `~/dev/`.
+
+- In `my_project`'s `package.json`, set `"@casechek/aws-cdk-elasticsearch-index": "../aws-cdk-elasticsearch-index",` for the dependency version
+- Run `npm install` in `my_project` (maybe `npm ci` is needed for a clean install)
+- Run `npm install` in `aws-cdk-elasticsearch-index` then run `npm run build`
+- Then wipe the `node_modules` directory (run `rm -rf node_modules`) in `aws-cdk-elasticsearch-index`
+- Then link your project's node_modules with the custom construct's directory's: 
+  + run `ln -s ../my_project/node_modules` in `aws-cdk-elasticsearch-index`
+  
+With this, you should be able to deploy your project's stack, and it will be using your modified custom construct.
 
 ## Contributing
 
