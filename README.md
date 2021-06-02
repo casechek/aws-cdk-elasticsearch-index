@@ -111,7 +111,7 @@ It's helpful to be able to test a change you're working on in your own project's
 - Run `npm install` in `my_project` (maybe `npm ci` is needed for a clean install)
 - Run `npm install` in `aws-cdk-elasticsearch-index` then run `npm run build`
 - Then wipe the `node_modules` directory (run `rm -rf node_modules`) in `aws-cdk-elasticsearch-index`
-- Then link your project's node_modules with the custom construct's directory's: 
+- Then link your project's node_modules with the one in custom construct's directory: 
   + run `ln -s ../my_project/node_modules` in `aws-cdk-elasticsearch-index`
   
 With this, you should be able to deploy your project's stack, and it will be using your modified custom construct.
