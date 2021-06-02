@@ -5,7 +5,7 @@ import {
 import { S3 } from 'aws-sdk';
 import { Client } from '@elastic/elasticsearch';
 import { randomBytes } from 'crypto';
-import { INDEX_NAME_KEY } from '../../../src/on-event/constants';
+import { INDEX_NAME_KEY } from '../../../src/constants';
 
 const cryptoToStringFn = jest.fn();
 
