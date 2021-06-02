@@ -47,7 +47,7 @@ const reIndexAllDocuments = async (
   es: Client,
   oldIndex: string,
   newIndex: string
-): Promise<string | undefined> => {
+): Promise<string> => {
   const response = await es.reindex({
     wait_for_completion: false,
     refresh: true,
@@ -63,7 +63,7 @@ const reIndexAllDocuments = async (
   if (response.body.timed_out) {
     throw new TimeoutError();
   }
-  return response.body?.task;
+  return response.body.task;
 };
 
 export const createHandler = (
