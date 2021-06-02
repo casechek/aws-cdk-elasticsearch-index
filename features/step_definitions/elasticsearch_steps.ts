@@ -6,7 +6,7 @@ let esClient: Client;
 const getESClient = (): Client => {
   if (esClient == null) {
     esClient = new Client({
-      node: process.env.ELASTICSEARCH_ENDPOINT,
+      node: process.env.ELASTICSEARCH_ENDPOINT ?? 'http://localhost:9200',
     });
   }
   return esClient;
@@ -42,7 +42,7 @@ Before({ tags: '@clearElasticSearch' }, async () => {
 Given(
   /^an elasticsearch index with prefix "([^"]*)" and id "([^"]*)" exists with mapping:$/,
   async (prefixNameEnv: string, id: string, mapping: string) => {
-    const index = `${process.env[prefixNameEnv]}-${id}`;
+    const index = `${process.env[prefixNameEnv] ?? 'test-index'}-${id}`;
     await getESClient().indices.create({ index, body: mapping });
   }
 );
@@ -50,7 +50,7 @@ Given(
 Given(
   /^an elasticsearch index with prefix "([^"]*)" and id "([^"]*)" has this document indexed:$/,
   async (prefixNameEnv: string, id: string, mapping: string) => {
-    const index = `${process.env[prefixNameEnv]}-${id}`;
+    const index = `${process.env[prefixNameEnv] ?? 'test-index'}-${id}`;
     await getESClient().index({ index, refresh: 'true', body: mapping });
   }
 );
@@ -58,7 +58,7 @@ Given(
 Given(
   /^an elasticsearch index with prefix "([^"]*)" with id not "([^"]*)" has this document indexed:$/,
   async (prefixNameEnv: string, notId: string, mapping: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefixAndNotId(prefix, notId);
 
     await getESClient().index({ index, refresh: 'true', body: mapping });
@@ -68,7 +68,7 @@ Given(
 Then(
   /^an elasticsearch index with prefix "([^"]*)" exists$/,
   async (prefixNameEnv: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefix(prefix);
     // tslint:disable-next-line:no-unused-expression
     expect(index).to.not.be.undefined;
@@ -78,7 +78,7 @@ Then(
 Then(
   /^an elasticsearch index with prefix "([^"]*)" with id not "([^"]*)" exists$/,
   async (prefixNameEnv: string, notId: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefixAndNotId(prefix, notId);
     // tslint:disable-next-line:no-unused-expression
     expect(index).to.not.be.undefined;
@@ -88,7 +88,7 @@ Then(
 Then(
   /^an elasticsearch index with prefix "([^"]*)" does not exist$/,
   async (prefixNameEnv: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefix(prefix);
     // tslint:disable-next-line:no-unused-expression
     expect(index).to.be.undefined;
@@ -98,7 +98,7 @@ Then(
 Then(
   /^an elasticsearch index with prefix "([^"]*)" and id "([^"]*)" does not exist$/,
   async (prefixNameEnv: string, id: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const indices = await getIndicesWithPrefix(prefix);
     // tslint:disable-next-line:no-unused-expression
     expect(indices).to.not.contain(`${prefix}-${id}`);
@@ -108,7 +108,7 @@ Then(
 Then(
   /^the elasticsearch index with prefix "([^"]*)" has mapping:$/,
   async (prefixNameEnv: string, expected: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefix(prefix);
 
     const mapping = await getESClient().indices.getMapping({ index });
@@ -120,7 +120,7 @@ Then(
 Then(
   /^the elasticsearch index with prefix "([^"]*)" with id not "([^"]*)" has mapping:$/,
   async (prefixNameEnv: string, notId: string, expected: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefixAndNotId(prefix, notId);
 
     const mapping = await getESClient().indices.getMapping({ index });
@@ -132,7 +132,7 @@ Then(
 Then(
   /^the elasticsearch index with prefix "([^"]*)" with id not "([^"]*)" has this document indexed:$/,
   async (prefixNameEnv: string, notId: string, expected: string) => {
-    const prefix = process.env[prefixNameEnv] as string;
+    const prefix = process.env[prefixNameEnv] ?? 'test-index';
     const [index] = await getIndicesWithPrefixAndNotId(prefix, notId);
 
     const match = JSON.parse(expected);

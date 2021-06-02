@@ -11,10 +11,11 @@ let functionName: string;
 let port: string | undefined;
 const validator = new Validator();
 
+const awsEndpoint = process.env.AWS_ENDPOINT ?? 'http://localhost';
+const s3Endpoint = process.env.S3_ENDPOINT ?? 'http://localhost:1080';
+
 Before(async () => {
-  if (process.env.S3_ENDPOINT) {
-    await axios.put(`${process.env.S3_ENDPOINT}/reset`);
-  }
+  await axios.put(`${s3Endpoint}/reset`);
 });
 
 When(
@@ -23,10 +24,8 @@ When(
   async (event: string) => {
     const client = new Lambda({
       apiVersion: 'latest',
-      endpoint: port
-        ? `${process.env.AWS_ENDPOINT}:${port}`
-        : process.env.AWS_ENDPOINT,
-      region: process.env.AWS_REGION,
+      endpoint: port ? `${awsEndpoint}:${port}` : awsEndpoint,
+      region: process.env.AWS_REGION ?? 'us-east-1',
     });
     response = await client
       .invoke({
@@ -56,14 +55,16 @@ Given(/^lambda function "([^"]*)"$/, functionNameEnv => {
 });
 
 Given(/^AWS port "([^"]*)"$/, portEnv => {
-  port = process.env[portEnv];
+  port = process.env[portEnv] ?? '9001';
 });
 
 Given(
   /^a index configuration file "([^"]*)" exists in bucket "([^"]*)" with contents:$/,
   async (fileNameEnv, bucketNameEnv, contents) => {
-    const path = `/${process.env[bucketNameEnv]}/${process.env[fileNameEnv]}`;
-    await axios.put(`${process.env.S3_ENDPOINT}/mockserver/expectation`, {
+    const path = `/${process.env[bucketNameEnv] ?? 'test-bucket'}/${process.env[
+      fileNameEnv
+    ] ?? 'test-object-key'}`;
+    await axios.put(`${s3Endpoint}/mockserver/expectation`, {
       httpRequest: {
         path,
       },
