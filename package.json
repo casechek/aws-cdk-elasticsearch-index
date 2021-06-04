@@ -33,7 +33,7 @@
     "@types/chai": "4.2.11",
     "@types/cucumber": "6.0.1",
     "@types/deep-equal": "1.0.1",
-    "@types/jest": "25.2.3",
+    "@types/jest": "26.0.23",
     "@types/jsonschema": "1.1.1",
     "@types/memory-fs": "0.3.2",
     "@types/mock-fs": "4.10.0",
